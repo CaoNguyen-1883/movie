@@ -1,0 +1,66 @@
+# Các file và thư mục của Node.js
+node_modules
+package-lock.json
+npm-debug.log
+yarn.lock
+
+# Thư mục build và dist
+build
+dist
+
+# Các file cấu hình môi trường (nên giữ bí mật)
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+
+# Các file và thư mục tạm thời của IDE
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+
+# Các file log và debug
+*.log
+*.dump
+
+# Thư mục cache và temporary
+.cache
+tmp
+temp
+
+# Các file output của trình biên dịch TypeScript
+*.js
+*.js.map
+*.d.ts
+
+# Các file và thư mục đặc trưng của React
+/public/build # Nếu bạn build React vào thư mục public
+/coverage
+
+# Các file và thư mục đặc trưng của Express.js (nếu có)
+/backend/node_modules
+/backend/package-lock.json
+/backend/npm-debug.log
+/backend/yarn.lock
+/backend/dist # Thư mục chứa file JavaScript đã biên dịch của backend
+
+# Các file nén
+*.zip
+*.rar
+*.tar.gz
+
+# Các file hệ điều hành cụ thể
+.DS_Store
+Thumbs.db
+
+# Các file có thể do người dùng tạo ra
+.history
