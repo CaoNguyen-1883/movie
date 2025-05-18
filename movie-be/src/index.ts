@@ -2,6 +2,9 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { errorHandler } from './middlewares/errorHandler';
 import { AppException } from './exceptions/AppException';
+import userRoutes from './routes/user.routes';
+import roleRoutes from './routes/role.routes';
+import permissionRoutes from './routes/permission.routes';
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -14,6 +17,11 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.json({ message: 'Welcome to Movie API' });
 });
+
+// API Routes
+app.use('/api/users', userRoutes);
+app.use('/api/roles', roleRoutes);
+app.use('/api/permissions', permissionRoutes);
 
 // Test error handler
 app.get('/error', () => {

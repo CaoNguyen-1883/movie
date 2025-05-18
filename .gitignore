@@ -64,3 +64,11 @@ Thumbs.db
 
 # Các file có thể do người dùng tạo ra
 .history
+
+# Các file cần thiết cho Docker
+docker-compose.yml
+docker-compose.override.yml
+
+# Các file init và seed
+
+seeders/initialData.ts
