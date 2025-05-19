@@ -6,10 +6,80 @@ http://localhost:5000/api
 ```
 
 ## Authentication
-All API endpoints (except authentication endpoints) require a valid JWT token in the Authorization header:
+The application uses JWT (JSON Web Tokens) with refresh token mechanism for authentication.
+
+### Token Types
+1. **Access Token**
+   - Short-lived token (15 minutes)
+   - Used for API authorization
+   - Sent in Authorization header
+   ```
+   Authorization: Bearer <access_token>
+   ```
+
+2. **Refresh Token**
+   - Long-lived token (7 days)
+   - Used to obtain new access tokens
+   - Stored in HTTP-only cookie
+   - Automatically sent with requests
+
+### Authentication Endpoints
+
+#### Login
+```http
+POST /auth/login
 ```
-Authorization: Bearer <token>
+**Request Body:**
+```json
+{
+    "email": "string",
+    "password": "string"
+}
 ```
+**Response:**
+```json
+{
+    "status": "success",
+    "data": {
+        "user": {
+            "id": "string",
+            "username": "string",
+            "email": "string",
+            "fullName": "string",
+            "roles": ["string"]
+        },
+        "accessToken": "string"
+    }
+}
+```
+**Note:** Refresh token is automatically set as HTTP-only cookie
+
+#### Refresh Token
+```http
+POST /auth/refresh-token
+```
+**Response:**
+```json
+{
+    "status": "success",
+    "data": {
+        "accessToken": "string"
+    }
+}
+```
+
+#### Logout
+```http
+POST /auth/logout
+```
+**Response:**
+```json
+{
+    "status": "success",
+    "message": "Logged out successfully"
+}
+```
+**Note:** Clears both access token and refresh token
 
 ## Error Response Format
 All error responses follow this format:

@@ -1,6 +1,7 @@
 import { User } from '../models/user.model';
 import { AppException } from '../exceptions/AppException';
 import { IUser } from '../interfaces/user.interface';
+import { Document } from 'mongoose';
 
 export class UserService {
     async findAll() {
@@ -43,8 +44,7 @@ export class UserService {
             throw new AppException('User already exists', 400, 'USER_EXISTS');
         }
 
-        const user = await User.create(userData);
-
+        const user = await User.create(userData) as Document & { _id: string };
         return this.findById(user._id);
     }
 

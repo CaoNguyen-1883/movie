@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { IUser } from '../interfaces/user.interface';
 
-const UserSchema: Schema = new Schema({
+const UserSchema: Schema = new Schema<IUser>({
     username: {
         type: String,
         required: true,
@@ -20,7 +20,7 @@ const UserSchema: Schema = new Schema({
     password: {
         type: String,
         required: true,
-        minlength: 6
+        select: false
     },
     fullName: {
         type: String,
@@ -52,7 +52,8 @@ UserSchema.pre('save', async function(next) {
     
     try {
         const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password, salt);
+        const password = this.password as string;
+        this.password = await bcrypt.hash(password, salt);
         next();
     } catch (error) {
         next(error as Error);
@@ -61,8 +62,11 @@ UserSchema.pre('save', async function(next) {
 
 // Method to compare password
 UserSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
-    const user = this as IUser & Document;
-    return bcrypt.compare(candidatePassword, user.password);
+    try {
+        return await bcrypt.compare(candidatePassword, this.password as string);
+    } catch (error) {
+        throw error;
+    }
 };
 
 export const User = mongoose.model<IUser & Document>('User', UserSchema); 

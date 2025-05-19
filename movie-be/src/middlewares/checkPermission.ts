@@ -5,7 +5,8 @@ import { User } from '../models/user.model';
 export const checkPermission = (requiredPermission: string) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = req?.user?.id;
+            const userId = req.user?.userId;
+            
             if (!userId) {
                 throw new AppException('Unauthorized', 401, 'UNAUTHORIZED');
             }
@@ -24,7 +25,7 @@ export const checkPermission = (requiredPermission: string) => {
 
             const hasPermission = user.roles.some(role => 
                 role.permissions.some(permission => 
-                    permission.code === requiredPermission
+                    permission.name === requiredPermission
                 )
             );
 

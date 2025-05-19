@@ -1,0 +1,3 @@
+# Allow reading .env files
+!.env
+!.env.* 
