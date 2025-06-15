@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
-        "target": "ES2020",
+        "target": "ES2021",
         "module": "commonjs",
-        "lib": ["ES2020"],
+        "lib": ["ES2021"],
         "outDir": "./dist",
         "rootDir": "./src",
         "strict": true,
@@ -10,16 +10,16 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
 
-
         // For module-alias
         "moduleResolution": "node",
         "resolveJsonModule": true,
 
-        "baseUrl": ".",
+        "baseUrl": "./src",
         "paths": {
-            "@/*": ["src/*"]
-        }
+            "@/*": ["*"]
+        },
+        "typeRoots": ["./node_modules/@types", "./src/types"]
     },
     "include": ["src/**/*"],
-    "exclude": ["node_modules", "dist"]
+    "exclude": ["node_modules"]
 }

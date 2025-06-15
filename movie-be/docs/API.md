@@ -1,110 +1,142 @@
-# Movie API Documentation
+# API Documentation
+
+This document provides a detailed specification for the Movie API, including authentication, available endpoints, request/response formats, and error handling.
 
 ## Base URL
+All API endpoints are prefixed with the following base URL:
 ```
-http://localhost:5000/api
+/api/v1
 ```
 
 ## Authentication
-The application uses JWT (JSON Web Tokens) with refresh token mechanism for authentication.
+The application uses **JWT (JSON Web Tokens)** for securing API endpoints.
 
-### Token Types
-1. **Access Token**
-   - Short-lived token (15 minutes)
-   - Used for API authorization
-   - Sent in Authorization header
-   ```
-   Authorization: Bearer <access_token>
-   ```
+- **Access Token**: A short-lived token (default: 15 minutes) sent in the `Authorization` header with the `Bearer` scheme. It is used to access protected resources.
+- **Refresh Token**: A long-lived token (default: 7 days) used to obtain a new access token without requiring the user to log in again.
 
-2. **Refresh Token**
-   - Long-lived token (7 days)
-   - Used to obtain new access tokens
-   - Stored in HTTP-only cookie
-   - Automatically sent with requests
+Both tokens are returned in the response body upon successful login or registration. The client is responsible for securely storing these tokens.
 
-### Authentication Endpoints
-
-#### Login
-```http
-POST /auth/login
+### Example Authorization Header
 ```
-**Request Body:**
+Authorization: Bearer <your_access_token>
+```
+
+---
+
+## Authentication Endpoints
+
+### 1. Register a New User
+Creates a new user account.
+
+- **Endpoint**: `POST /auth/register`
+- **Description**: Registers a new user with a username, email, and password.
+- **Request Body**:
+  ```json
+  {
+      "username": "testuser",
+      "email": "user@example.com",
+      "password": "Password123"
+  }
+  ```
+- **Successful Response (201 Created)**:
+  ```json
+  {
+      "user": {
+          "id": "60c72b2f9b1d8e001f8e8b8b",
+          "username": "testuser",
+          "email": "user@example.com",
+          "role": "USER"
+      },
+      "tokens": {
+          "access": {
+              "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+              "expires": "2023-05-20T12:15:00.000Z"
+          },
+          "refresh": {
+              "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+              "expires": "2023-05-27T12:00:00.000Z"
+          }
+      }
+  }
+  ```
+
+### 2. Login
+Authenticates a user and returns access and refresh tokens.
+
+- **Endpoint**: `POST /auth/login`
+- **Description**: Logs in a user with their email and password.
+- **Request Body**:
+  ```json
+  {
+      "email": "user@example.com",
+      "password": "Password123"
+  }
+  ```
+- **Successful Response (200 OK)**:
+  Returns the same response structure as the register endpoint, containing user information and tokens.
+
+---
+
+## Error Handling
+The API uses a standardized error response format.
+
+### Error Response Format (Production)
+In a production environment, errors will return a clean and simple response.
+
 ```json
 {
-    "email": "string",
-    "password": "string"
+    "status": "fail", // or "error" for server-side issues
+    "message": "A descriptive error message."
 }
 ```
-**Response:**
+**Example (401 Unauthorized)**:
 ```json
 {
-    "status": "success",
-    "data": {
-        "user": {
-            "id": "string",
-            "username": "string",
-            "email": "string",
-            "fullName": "string",
-            "roles": ["string"]
-        },
-        "accessToken": "string"
-    }
-}
-```
-**Note:** Refresh token is automatically set as HTTP-only cookie
-
-#### Refresh Token
-```http
-POST /auth/refresh-token
-```
-**Response:**
-```json
-{
-    "status": "success",
-    "data": {
-        "accessToken": "string"
-    }
+    "status": "fail",
+    "message": "Incorrect email/username or password"
 }
 ```
 
-#### Logout
-```http
-POST /auth/logout
-```
-**Response:**
+### Error Response Format (Development)
+In a development environment, the error response includes a full stack trace for easier debugging.
 ```json
 {
-    "status": "success",
-    "message": "Logged out successfully"
-}
-```
-**Note:** Clears both access token and refresh token
-
-## Error Response Format
-All error responses follow this format:
-```json
-{
-    "status": "error",
-    "code": "ERROR_CODE",
-    "message": "Error message",
-    "errors": [] // Optional array of validation errors
+    "status": "fail",
+    "error": { ...full error object... },
+    "message": "A descriptive error message.",
+    "stack": "Error: ... at ..."
 }
 ```
 
-## Error Codes
-| Code | HTTP Status | Description |
-|------|-------------|-------------|
-| UNAUTHORIZED | 401 | User is not authenticated |
-| FORBIDDEN | 403 | User doesn't have required permissions |
-| USER_NOT_FOUND | 404 | User not found |
-| USER_EXISTS | 400 | User already exists |
-| ROLE_NOT_FOUND | 404 | Role not found |
-| ROLE_EXISTS | 400 | Role already exists |
-| PERMISSION_NOT_FOUND | 404 | Permission not found |
-| PERMISSION_EXISTS | 400 | Permission already exists |
-| VALIDATION_ERROR | 400 | Request validation failed |
-| INTERNAL_SERVER_ERROR | 500 | Server error |
+### Common HTTP Status Codes
+- `200 OK`: Request was successful.
+- `201 Created`: The resource was successfully created.
+- `400 Bad Request`: The request was invalid (e.g., missing fields, validation error).
+- `401 Unauthorized`: Authentication failed or token is missing/invalid.
+- `403 Forbidden`: The user does not have permission to access the resource.
+- `404 Not Found`: The requested resource could not be found.
+- `409 Conflict`: The request could not be completed due to a conflict (e.g., email already exists).
+- `500 Internal Server Error`: An unexpected error occurred on the server.
+---
+
+## Future API Sections (Design Blueprint)
+
+The following sections outline the designed structure for future API development.
+
+### User Management
+- `GET /users`: Get a list of all users.
+- `GET /users/:id`: Get a single user by ID.
+- `PUT /users/:id`: Update a user's details.
+- `DELETE /users/:id`: Delete a user.
+
+### Role Management
+- `GET /roles`: Get all roles.
+- `POST /roles`: Create a new role.
+- `PUT /roles/:id`: Update a role.
+- `DELETE /roles/:id`: Delete a role.
+
+### Permission Management
+- `GET /permissions`: Get all available permissions.
 
 ## User Management
 

@@ -1,18 +1,39 @@
 import Joi from 'joi';
+import { password } from '@/validations/custom.validation';
 
-export const loginSchema = Joi.object({
-    email: Joi.string()
-        .email()
-        .required()
-        .messages({
-            'string.email': 'Please provide a valid email address',
-            'any.required': 'Email is required'
-        }),
-    password: Joi.string()
-        .min(6)
-        .required()
-        .messages({
-            'string.min': 'Password must be at least 6 characters long',
-            'any.required': 'Password is required'
-        })
-}); 
+const register = {
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().custom(password),
+    username: Joi.string().required().min(3).max(30),
+    role: Joi.string().optional().valid('USER', 'MODERATOR', 'ADMIN'),
+  }),
+};
+
+const login = {
+  body: Joi.object().keys({
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  }),
+};
+
+const logout = {
+  body: Joi.object().keys({
+    refreshToken: Joi.string().required(),
+  }),
+};
+
+const refreshTokens = {
+  body: Joi.object().keys({
+    refreshToken: Joi.string().required(),
+  }),
+};
+
+// Add other validation schemas here e.g., for logout, refreshToken, etc.
+
+export const authValidation = {
+  register,
+  login,
+  logout,
+  refreshTokens,
+}; 
