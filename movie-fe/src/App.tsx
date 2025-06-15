@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route, Outlet } from 'react-router-dom';
+import AuthPage from '@/pages/AuthPage';
+// import Navbar from '@/components/layout/Navbar'; // Example Navbar
+// import Footer from '@/components/layout/Footer'; // Example Footer
+import './App.css';
+
+// Placeholder for a general layout component
+const AppLayout = () => (
+  <div className="app-container">
+    {/* <Navbar /> */}
+    <main className="main-content">
+      <Outlet /> {/* Nested routes will render here */}
+    </main>
+    {/* <Footer /> */}
+  </div>
+);
+
+// Placeholder for a simple Home page component
+const HomePage = () => (
+  <div className="p-4">
+    <h1 className="text-2xl">Welcome to the Movie App</h1>
+    <p>This is the home page.</p>
+    {/* Link to AuthPage for testing */}
+    <a href="/auth" className="text-blue-500 hover:underline">Go to Auth Page</a>
+  </div>
+);
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Routes>
+      <Route path="/" element={<AppLayout />}>
+        <Route index element={<HomePage />} /> {/* Default page for / */}
+        {/* Add other main application routes here */}
+      </Route>
+      <Route path="/auth" element={<AuthPage />} />
+      {/* You could add a NotFoundPage component for a 404 route */}
+      {/* <Route path="*" element={<NotFoundPage />} /> */}
+    </Routes>
+  );
 }
 
-export default App
+export default App;
