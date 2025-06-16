@@ -1,0 +1,72 @@
+import httpStatus from 'http-status';
+import Genre from '@/models/genre.model';
+import { IGenre } from '@/interfaces/genre.interface';
+import { AppError } from '@/utils/AppError';
+
+/**
+ * Create a genre
+ * @param {IGenre} genreBody
+ * @returns {Promise<IGenre>}
+ */
+const createGenre = async (genreBody: Partial<IGenre>): Promise<IGenre> => {
+  if (await Genre.findOne({ name: genreBody.name })) {
+    throw new AppError('Genre already exists', httpStatus.CONFLICT);
+  }
+  return Genre.create(genreBody);
+};
+
+/**
+ * Query for genres
+ * @returns {Promise<IGenre[]>}
+ */
+const getGenres = async (): Promise<IGenre[]> => {
+  return Genre.find();
+};
+
+/**
+ * Get genre by id
+ * @param {string} id
+ * @returns {Promise<IGenre>}
+ */
+const getGenreById = async (id: string): Promise<IGenre> => {
+  const genre = await Genre.findById(id);
+  if (!genre) {
+    throw new AppError('Genre not found', httpStatus.NOT_FOUND);
+  }
+  return genre;
+};
+
+/**
+ * Update genre by id
+ * @param {string} genreId
+ * @param {Partial<IGenre>} updateBody
+ * @returns {Promise<IGenre>}
+ */
+const updateGenreById = async (genreId: string, updateBody: Partial<IGenre>): Promise<IGenre> => {
+  const genre = await getGenreById(genreId);
+  if (updateBody.name && (await Genre.findOne({ name: updateBody.name, _id: { $ne: genreId } }))) {
+    throw new AppError('Genre with that name already exists', httpStatus.CONFLICT);
+  }
+  Object.assign(genre, updateBody);
+  await genre.save();
+  return genre;
+};
+
+/**
+ * Delete genre by id
+ * @param {string} genreId
+ * @returns {Promise<IGenre>}
+ */
+const deleteGenreById = async (genreId: string): Promise<IGenre> => {
+  const genre = await getGenreById(genreId);
+  await genre.deleteOne();
+  return genre;
+};
+
+export const genreService = {
+  createGenre,
+  getGenres,
+  getGenreById,
+  updateGenreById,
+  deleteGenreById,
+}; 

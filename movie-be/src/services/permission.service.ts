@@ -1,4 +1,5 @@
-import { Permission, IPermission } from '@/models/permission.model';
+import Permission from '@/models/permission.model';
+import { IPermission } from '@/interfaces/permission.interface';
 
 /**
  * Get all available permissions.

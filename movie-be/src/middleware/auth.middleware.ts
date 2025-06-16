@@ -2,11 +2,14 @@ import passport from 'passport';
 import { Strategy as JwtStrategy, ExtractJwt, VerifyCallback } from 'passport-jwt';
 import httpStatus from 'http-status';
 import config from '@/config/config';
-import { User, IUser } from '@/models/user.model';
-import { IRole } from '@/models/role.model';
+import User from '@/models/user.model';
+import { IUser } from '@/interfaces/user.interface';
+import { IRole } from '@/interfaces/role.interface';
 import { AppError } from '@/utils/AppError';
 import { TokenTypes } from '@/config/tokens';
 import { Request, Response, NextFunction } from 'express';
+import Permission from '@/models/permission.model';
+import { Types } from 'mongoose';
 
 const jwtOptions = {
   secretOrKey: config.jwtSecret,
@@ -25,8 +28,8 @@ const jwtVerify: VerifyCallback = async (payload, done) => {
     if (payload.type !== TokenTypes.ACCESS) {
       return done(new AppError('Invalid token type', httpStatus.UNAUTHORIZED), false);
     }
-    // Find user and eager-load their role information
-    const user = await User.findById(payload.sub).populate('role');
+    // Find user and populate their roles
+    const user = await User.findById(payload.sub).populate('roles');
     if (!user) {
       return done(null, false);
     }
@@ -45,27 +48,47 @@ export const jwtStrategy = new JwtStrategy(jwtOptions, jwtVerify);
  * @returns An authentication middleware.
  */
 export const auth = (...requiredPermissions: string[]) => (req: Request, res: Response, next: NextFunction) => {
-  passport.authenticate('jwt', { session: false }, (err: Error, user: IUser, info: any) => {
-    if (err || info || !user) {
-      return next(new AppError('Please authenticate', httpStatus.UNAUTHORIZED));
-    }
-
-    // Attach user to the request object
-    req.user = user;
-
-    if (requiredPermissions.length) {
-      // user.role is now a populated Role document because of `.populate('role')` in jwtVerify
-      const userPermissions = (user.role as IRole)?.permissions || [];
-      const hasRequiredPermissions = requiredPermissions.every((requiredPermission) =>
-        userPermissions.includes(requiredPermission)
-      );
-
-      if (!hasRequiredPermissions) {
-        const message = `Forbidden: You need the following permission(s): ${requiredPermissions.join(', ')}`;
-        return next(new AppError(message, httpStatus.FORBIDDEN));
+  passport.authenticate('jwt', { session: false }, async (err: Error, user: IUser, info: any) => {
+    try {
+      if (err || info || !user) {
+        return next(new AppError('Please authenticate', httpStatus.UNAUTHORIZED));
       }
-    }
 
-    next();
+      req.user = user;
+
+      if (requiredPermissions.length) {
+        const userPermissionIds = new Set<string>();
+        // After .populate('roles'), user.roles is an array of IRole objects
+        const populatedRoles = user.roles as unknown as IRole[];
+
+        if (populatedRoles && Array.isArray(populatedRoles)) {
+          populatedRoles.forEach((role) => {
+            if (role.permissions && Array.isArray(role.permissions)) {
+              role.permissions.forEach((permissionId: Types.ObjectId) => {
+                userPermissionIds.add(permissionId.toString());
+              });
+            }
+          });
+        }
+
+        const requiredPermsDocs = await Permission.find({ name: { $in: requiredPermissions } });
+
+        if (requiredPermsDocs.length !== requiredPermissions.length) {
+          // This indicates a misconfiguration in a route's required permissions
+          return next(new AppError('Invalid permission defined for this route', httpStatus.INTERNAL_SERVER_ERROR));
+        }
+
+        const hasRequiredPermissions = requiredPermsDocs.length > 0 && requiredPermsDocs.some((perm) => userPermissionIds.has(perm._id.toString()));
+
+        if (!hasRequiredPermissions) {
+          const message = `Forbidden: You do not have the required permission(s): ${requiredPermissions.join(', ')}`;
+          return next(new AppError(message, httpStatus.FORBIDDEN));
+        }
+      }
+
+      return next();
+    } catch (error) {
+      return next(error);
+    }
   })(req, res, next);
 }; 

@@ -1,54 +1,41 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import { model, Schema } from 'mongoose';
+import { IPermission, PermissionType } from '@/interfaces/permission.interface';
 
-export enum PermissionType {
-  // User permissions
-  CREATE_USER = 'CREATE_USER',
-  READ_USER = 'READ_USER',
-  UPDATE_USER = 'UPDATE_USER',
-  DELETE_USER = 'DELETE_USER',
-  
-  // Role permissions
-  MANAGE_ROLES = 'MANAGE_ROLES',
-  
-  // Content permissions
-  CREATE_CONTENT = 'CREATE_CONTENT',
-  READ_CONTENT = 'READ_CONTENT',
-  UPDATE_CONTENT = 'UPDATE_CONTENT',
-  DELETE_CONTENT = 'DELETE_CONTENT',
-  
-  // System permissions
-  MANAGE_SYSTEM = 'MANAGE_SYSTEM'
-}
-
-export interface IPermission extends Document {
-  name: PermissionType;
-  description: string;
-  isActive: boolean;
-}
-
-const permissionSchema = new Schema<IPermission>({
-  name: {
-    type: String,
-    enum: Object.values(PermissionType),
-    required: true,
-    unique: true
+const PermissionSchema = new Schema<IPermission>(
+  {
+    name: {
+      type: String,
+      enum: Object.values(PermissionType),
+      required: true,
+      unique: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
-  description: {
-    type: String,
-    required: true
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (doc, ret) => {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+    toObject: {
+      virtuals: true,
+    },
   },
-  isActive: {
-    type: Boolean,
-    default: true
-  }
-}, {
-  timestamps: true
-});
+);
 
-// Pre-save middleware to ensure permission name is uppercase
-permissionSchema.pre('save', function(next) {
-  this.name = this.name.toUpperCase() as PermissionType;
-  next();
-});
+PermissionSchema.index({ name: 1 });
 
-export const Permission = mongoose.model<IPermission>('Permission', permissionSchema); 
+const Permission = model<IPermission>('Permission', PermissionSchema);
+
+export default Permission; 

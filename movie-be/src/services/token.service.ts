@@ -2,7 +2,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import moment from 'moment';
 import httpStatus from 'http-status';
 import config from '@/config/config';
-import { IUser } from '@/models/user.model';
+import { IUser } from '@/interfaces/user.interface';
 import { Token, IToken } from '@/models/token.model';
 import { AppError } from '@/utils/AppError';
 import { TokenTypes } from '@/config/tokens';

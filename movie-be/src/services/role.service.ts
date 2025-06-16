@@ -1,5 +1,6 @@
 import httpStatus from 'http-status';
-import { Role, IRole } from '@/models/role.model';
+import Role from '@/models/role.model';
+import { IRole } from '@/interfaces/role.interface';
 import { AppError } from '@/utils/AppError';
 
 /**

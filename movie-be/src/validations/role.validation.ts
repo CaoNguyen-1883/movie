@@ -1,14 +1,13 @@
 import Joi from 'joi';
-import { RoleType } from '@/models/role.model';
-import { PermissionType } from '@/models/permission.model';
+import { PermissionType } from '@/interfaces/permission.interface';
 
 const objectId = Joi.string().regex(/^[0-9a-fA-F]{24}$/, 'valid MongoDB ObjectId');
 
 const createRole = {
   body: Joi.object().keys({
-    name: Joi.string().required().valid(...Object.values(RoleType)),
+    name: Joi.string().required(),
     description: Joi.string().allow(''),
-    permissions: Joi.array().items(Joi.string().valid(...Object.values(PermissionType))),
+    permissions: Joi.array().items(objectId),
   }),
 };
 
@@ -24,9 +23,9 @@ const updateRole = {
   }),
   body: Joi.object()
     .keys({
-      name: Joi.string().valid(...Object.values(RoleType)),
+      name: Joi.string(),
       description: Joi.string().allow(''),
-      permissions: Joi.array().items(Joi.string().valid(...Object.values(PermissionType))),
+      permissions: Joi.array().items(objectId),
     })
     .min(1),
 };

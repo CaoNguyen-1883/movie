@@ -4,13 +4,14 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "dev": "nodemon --ext ts,d.ts,json --exec ts-node -r tsconfig-paths/register src/index.ts",
     "build": "tsc",
     "start": "node -r tsconfig-paths/register dist/index.js",
     "seed:admin": "ts-node -r tsconfig-paths/register src/seeders/admin.seeder.ts",
     "seed:permissions": "ts-node -r tsconfig-paths/register src/seeders/permission.seeder.ts",
     "seed:roles": "ts-node -r tsconfig-paths/register src/seeders/role.seeder.ts",
-    "seed:all": "npm run seed:permissions && npm run seed:roles && npm run seed:admin"
+    "seed:genres": "ts-node -r tsconfig-paths/register src/seeders/genre.seeder.ts",
+    "seed:all": "npm run seed:permissions && npm run seed:roles && npm run seed:genres && npm run seed:admin"
   },
   "dependencies": {
     "@types/joi": "^17.2.2",
@@ -42,5 +43,6 @@
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.0.3"
-  }
+  },
+  "keywords": []
 }

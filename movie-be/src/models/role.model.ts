@@ -1,44 +1,44 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
+import { IRole } from '@/interfaces/role.interface';
 
-export enum RoleType {
-  ADMIN = 'ADMIN',
-  USER = 'USER'
-}
-
-export interface IRole extends Document {
-  name: RoleType;
-  description: string;
-  permissions: string[];
-  isActive: boolean;
-}
-
-const roleSchema = new Schema<IRole>({
-  name: {
-    type: String,
-    enum: Object.values(RoleType),
-    required: true,
-    unique: true
+const RoleSchema = new Schema<IRole>(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      trim: true,
+    },
+    permissions: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Permission',
+      },
+    ],
+    isDefault: {
+      type: Boolean,
+      default: false,
+    },
   },
-  description: {
-    type: String,
-    required: true
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (doc, ret) => {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+    toObject: {
+      virtuals: true,
+    },
   },
-  permissions: [{
-    type: String,
-    required: true
-  }],
-  isActive: {
-    type: Boolean,
-    default: true
-  }
-}, {
-  timestamps: true
-});
+);
 
-// Pre-save middleware to ensure role name is uppercase
-roleSchema.pre('save', function(next) {
-  this.name = this.name.toUpperCase() as RoleType;
-  next();
-});
-
-export const Role = mongoose.model<IRole>('Role', roleSchema); 
+const Role = model<IRole>('Role', RoleSchema);
+export default Role; 

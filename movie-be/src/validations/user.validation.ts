@@ -1,6 +1,5 @@
 import Joi from 'joi';
 import { password } from './custom.validation';
-import { RoleType } from '@/models/role.model';
 
 const createUser = {
   body: Joi.object().keys({

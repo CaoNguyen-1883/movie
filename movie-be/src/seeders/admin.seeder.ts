@@ -1,9 +1,8 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import connectDB from '@/config/database';
-import { User } from '@/models/user.model';
-import { Role } from '@/models/role.model';
-import { RoleType } from '@/models/role.model';
+import User from '@/models/user.model';
+import Role from '@/models/role.model';
 
 dotenv.config();
 
@@ -22,7 +21,7 @@ const seedAdmin = async () => {
       process.exit(1);
     }
 
-    const adminRole = await Role.findOne({ name: RoleType.ADMIN });
+    const adminRole = await Role.findOne({ name: 'ADMIN' });
     if (!adminRole) {
       console.error('ADMIN role not found. Please run "npm run seed:roles" first.');
       process.exit(1);
@@ -36,8 +35,9 @@ const seedAdmin = async () => {
         email: adminEmail,
         username: adminUsername,
         password: adminPassword,
-        role: adminRole._id,
+        roles: [adminRole._id],
         isEmailVerified: true,
+        isActive: true,
       });
       console.log('✅ Admin user created successfully!');
     } else {

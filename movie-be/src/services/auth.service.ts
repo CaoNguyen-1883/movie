@@ -1,5 +1,6 @@
 import httpStatus from 'http-status';
-import { User, IUser } from '@/models/user.model';
+import User from '@/models/user.model';
+import { IUser } from '@/interfaces/user.interface';
 import { Token } from '@/models/token.model';
 import { AppError } from '@/utils/AppError';
 import { tokenService } from './token.service';
@@ -13,9 +14,9 @@ import { TokenTypes } from '@/config/tokens';
  * @throws {AppError} If login fails.
  */
 const loginUserWithEmailAndPassword = async (emailOrUsername: string, password: string) => {
-  // The 'findByEmailOrUsername' is a custom static method on the User model
-  // It should also select the password field, which is excluded by default.
-  const user = await User.findByEmailOrUsername(emailOrUsername);
+  const user = await User.findOne({
+    $or: [{ email: emailOrUsername.toLowerCase() }, { username: emailOrUsername.toLowerCase() }],
+  }).select('+password');
 
   if (!user || !(await user.comparePassword(password))) {
     throw new AppError('Incorrect email/username or password', httpStatus.UNAUTHORIZED);
@@ -24,10 +25,6 @@ const loginUserWithEmailAndPassword = async (emailOrUsername: string, password: 
   if (!user.isActive) {
     throw new AppError('User account is disabled', httpStatus.FORBIDDEN);
   }
-  
-  // Update last login time
-  user.lastLogin = new Date();
-  await user.save();
 
   return user;
 };
