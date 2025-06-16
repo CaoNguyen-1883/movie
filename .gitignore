@@ -40,7 +40,7 @@ temp
 # Các file output của trình biên dịch TypeScript
 *.js
 *.js.map
-*.d.ts
+# *.d.ts
 
 # Các file và thư mục đặc trưng của React
 /public/build # Nếu bạn build React vào thư mục public
