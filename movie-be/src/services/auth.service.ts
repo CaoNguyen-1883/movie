@@ -5,6 +5,7 @@ import { Token } from '@/models/token.model';
 import { AppError } from '@/utils/AppError';
 import { tokenService } from './token.service';
 import { TokenTypes } from '@/config/tokens';
+import Role from '@/models/role.model';
 
 /**
  * Login with username/email and password.
@@ -13,18 +14,24 @@ import { TokenTypes } from '@/config/tokens';
  * @returns {Promise<IUser>} The user object if login is successful.
  * @throws {AppError} If login fails.
  */
-const loginUserWithEmailAndPassword = async (emailOrUsername: string, password: string) => {
-  const user = await User.findOne({
-    $or: [{ email: emailOrUsername.toLowerCase() }, { username: emailOrUsername.toLowerCase() }],
-  }).select('+password');
+const loginUserWithEmailAndPassword = async (email: string, password: string): Promise<IUser> => {
+  const user = await User.findOne({ email }).select('+password').populate({
+    path: 'roles',
+    model: Role,
+    // If you need to populate permissions within roles:
+    // populate: { path: 'permissions' } 
+  });
 
   if (!user || !(await user.comparePassword(password))) {
-    throw new AppError('Incorrect email/username or password', httpStatus.UNAUTHORIZED);
+    throw new AppError('Incorrect email or password', httpStatus.UNAUTHORIZED);
   }
 
   if (!user.isActive) {
     throw new AppError('User account is disabled', httpStatus.FORBIDDEN);
   }
+
+  // We don't want to return the user object with the password
+  user.password = undefined;
 
   return user;
 };

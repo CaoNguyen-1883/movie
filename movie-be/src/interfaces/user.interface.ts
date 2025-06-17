@@ -10,5 +10,9 @@ export interface IUser extends Document {
   roles: Types.ObjectId[]; // Ref to Role
   isActive: boolean;
   isEmailVerified: boolean;
+  googleId?: string;
+  authProvider?: 'local' | 'google';
+  createdAt: Date;
+  updatedAt: Date;
   comparePassword(password: string): Promise<boolean>;
 } 

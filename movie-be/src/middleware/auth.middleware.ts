@@ -12,7 +12,7 @@ import Permission from '@/models/permission.model';
 import { Types } from 'mongoose';
 
 const jwtOptions = {
-  secretOrKey: config.jwtSecret,
+  secretOrKey: config.jwt.secret,
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 };
 

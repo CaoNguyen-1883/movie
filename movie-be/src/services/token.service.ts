@@ -19,7 +19,7 @@ const generateToken = (
   userId: string,
   expires: moment.Moment,
   type: TokenTypes,
-  secret: string = config.jwtSecret
+  secret: string = config.jwt.secret
 ): string => {
   const payload = {
     sub: userId,
@@ -62,10 +62,10 @@ const saveToken = async (
  * @returns {Promise<object>} An object containing the access and refresh tokens.
  */
 const generateAuthTokens = async (user: IUser) => {
-  const accessTokenExpires = moment().add(config.jwtAccessExpiresIn, 'seconds');
+  const accessTokenExpires = moment().add(config.jwt.accessExpiresIn, 'seconds');
   const accessToken = generateToken(user.id, accessTokenExpires, TokenTypes.ACCESS);
 
-  const refreshTokenExpires = moment().add(config.jwtRefreshExpiresIn, 'seconds');
+  const refreshTokenExpires = moment().add(config.jwt.refreshExpiresIn, 'seconds');
   const refreshToken = generateToken(user.id, refreshTokenExpires, TokenTypes.REFRESH);
   
   await saveToken(refreshToken, user.id, refreshTokenExpires, TokenTypes.REFRESH);
@@ -90,7 +90,7 @@ const generateAuthTokens = async (user: IUser) => {
  * @throws {AppError} If token is invalid or not found.
  */
 const verifyToken = async (token: string, type: TokenTypes): Promise<IToken> => {
-  const payload = jwt.verify(token, config.jwtSecret) as JwtPayload;
+  const payload = jwt.verify(token, config.jwt.secret) as JwtPayload;
 
   if (!payload.sub || payload.type !== type) {
     throw new AppError('Invalid token', httpStatus.UNAUTHORIZED);

@@ -4,6 +4,7 @@ import { userService } from '../services/user.service';
 import { authService } from '../services/auth.service';
 import { tokenService } from '../services/token.service';
 import { catchAsync } from '../utils/catchAsync';
+import { IUser } from '@/interfaces/user.interface';
 
 /**
  * Handles the registration of a new local user.
@@ -51,9 +52,19 @@ const refreshTokens = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const googleCallback = catchAsync(async (req: Request, res: Response) => {
+  // Passport populates req.user after successful authentication
+  const user = req.user as IUser;
+  const tokens = await tokenService.generateAuthTokens(user);
+  // You might want to redirect to your frontend with tokens in the query string
+  // For now, just sending them as a response.
+  res.status(httpStatus.OK).send({ user, tokens });
+});
+
 export const authController = {
   register,
   login,
   logout,
   refreshTokens,
+  googleCallback,
 };
