@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getMovieBySlug } from '@/services/movieApi';
 import { Badge } from '@/components/ui/badge';
@@ -11,12 +11,17 @@ import type { Movie } from '@/types/movie';
 import type { Genre } from '@/types/genre';
 import type { Person } from '@/types/person';
 import type { MovieCast } from '@/types/movie';
+import { useAuth } from '@/contexts/AuthContext';
+import { getHistoryForMovie, updateHistory } from '@/services/historyApi';
+import { ReviewSection } from '@/components/common/ReviewSection';
 
 const MovieDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const [videoUrl, setVideoUrl] = useState('');
   const [videoTitle, setVideoTitle] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const {
     data: movie,
@@ -29,6 +34,28 @@ const MovieDetailPage = () => {
       return getMovieBySlug(slug);
     },
     enabled: !!slug,
+  });
+
+  // Query to get the viewing history for this movie
+  const { data: historyData } = useQuery({
+    // The query will re-run if the movie ID or user ID changes
+    queryKey: ['history', movie?._id, user?._id], 
+    queryFn: () => {
+      if (!movie?._id) throw new Error('Movie ID is required');
+      return getHistoryForMovie(movie._id);
+    },
+    // Only enable this query if we have a movie and a logged-in user
+    enabled: !!movie?._id && !!user,
+  });
+
+
+  // Mutation to update the viewing history
+  const { mutate: updateHistoryMutation } = useMutation({
+    mutationFn: updateHistory,
+    onSuccess: () => {
+      // After a successful update, invalidate the history query to refetch the progress
+      queryClient.invalidateQueries({ queryKey: ['history', movie?._id, user?._id] });
+    },
   });
 
   const handlePlay = (type: 'trailer' | 'movie') => {
@@ -136,6 +163,23 @@ const MovieDetailPage = () => {
             </div>
           )}
 
+          {historyData && (
+             <div className="p-4 bg-secondary rounded-lg">
+                <h3 className="text-lg font-semibold mb-2 text-secondary-foreground">Viewing Progress</h3>
+                <p className="text-secondary-foreground/80">
+                  {historyData.isFinished 
+                    ? "You have finished watching this movie."
+                    : `You are ${Math.round((historyData.progress / (movie.duration * 60)) * 100)}% into this movie.`
+                  }
+                </p>
+                <progress 
+                  className="w-full mt-2 [&::-webkit-progress-bar]:rounded-lg [&::-webkit-progress-value]:rounded-lg [&::-webkit-progress-bar]:bg-slate-300 [&::-webkit-progress-value]:bg-violet-400 [&::-moz-progress-bar]:bg-violet-400" 
+                  value={historyData.progress} 
+                  max={movie.duration * 60}>
+                </progress>
+             </div>
+          )}
+
           <div className="flex items-center space-x-4">
             {movie.trailerUrl && (
               <Button onClick={() => handlePlay('trailer')}>
@@ -163,12 +207,6 @@ const MovieDetailPage = () => {
               {new Date(movie.releaseDate).getFullYear()}
             </p>
           </div>
-          <div>
-            <h3 className="text-xl font-semibold mb-2">Duration</h3>
-            <p className="text-foreground/80">
-              {movie.duration}
-            </p>
-          </div>
 
           {movie.directors && movie.directors.length > 0 && (
             <div>
@@ -194,7 +232,14 @@ const MovieDetailPage = () => {
         onClose={handleCloseModal}
         videoUrl={videoUrl}
         title={videoTitle}
+        movieId={movie?._id}
+        onProgressUpdate={updateHistoryMutation}
       />
+
+      <hr className="my-12 border-t" />
+
+      <ReviewSection movieId={movie._id} />
+
     </div>
   );
 };

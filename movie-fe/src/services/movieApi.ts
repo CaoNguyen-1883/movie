@@ -1,4 +1,4 @@
-import type { Movie, MovieCast } from '@/types/movie';
+import type { Movie } from '@/types/movie';
 import type { PaginatedResponse } from '@/types/api';
 import api from '@/lib/axios';
 

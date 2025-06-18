@@ -1,21 +1,49 @@
-import type { Review } from '@/types/review';
+
 import api from '@/lib/axios';
+import type { Review } from '@/types/review';
 
-export const getReviewsByMovie = async (movieId: string, params?: any): Promise<{ results: Review[], totalResults: number }> => {
-  const response = await api.get(`/reviews/movie/${movieId}`, { params });
-  return response.data.data;
+/**
+ * Payload for creating a new review.
+ */
+interface CreateReviewPayload {
+  movieId: string;
+  rating: number;
+  comment?: string;
+}
+
+/**
+ * Payload for updating an existing review.
+ */
+type UpdateReviewPayload = Partial<Omit<CreateReviewPayload, 'movieId'>>;
+
+
+/**
+ * Fetches all reviews for a specific movie.
+ */
+export const getReviewsByMovie = async (movieId: string): Promise<Review[]> => {
+  const { data } = await api.get(`/reviews/movie/${movieId}`);
+  return data.data;
 };
 
-export const createReview = async (reviewData: Partial<Review>): Promise<Review> => {
-  const response = await api.post('/reviews', reviewData);
-  return response.data.data;
+/**
+ * Creates a new review.
+ */
+export const createReview = async (payload: CreateReviewPayload): Promise<Review> => {
+  const { data } = await api.post('/reviews', payload);
+  return data.data;
 };
 
-export const updateReview = async (reviewId: string, updateData: Partial<Review>): Promise<Review> => {
-  const response = await api.patch(`/reviews/${reviewId}`, updateData);
-  return response.data.data;
+/**
+ * Updates an existing review by its ID.
+ */
+export const updateReview = async (reviewId: string, payload: UpdateReviewPayload): Promise<Review> => {
+  const { data } = await api.patch(`/reviews/${reviewId}`, payload);
+  return data.data;
 };
 
+/**
+ * Deletes a review by its ID.
+ */
 export const deleteReview = async (reviewId: string): Promise<void> => {
   await api.delete(`/reviews/${reviewId}`);
 }; 

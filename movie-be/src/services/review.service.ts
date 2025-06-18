@@ -46,7 +46,7 @@ const createReview = async (
  * @returns {Promise<IReview[]>}
  */
 const getReviewsByMovie = async (movieId: string): Promise<IReview[]> => {
-  return Review.find({ movie: movieId }).populate('user', 'username avatarUrl');
+  return Review.find({ movie: movieId }).populate('user', '_id fullName username avatarUrl');
 };
 
 /**

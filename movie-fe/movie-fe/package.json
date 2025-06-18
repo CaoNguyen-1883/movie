@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "movie-fe": "file:.."
+    "movie-fe": "file:..",
+    "react-youtube": "^10.1.0"
   }
 }

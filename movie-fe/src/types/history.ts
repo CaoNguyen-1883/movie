@@ -1,10 +1,15 @@
-import type { User } from './user';
 import type { Movie } from './movie';
 
-export interface History {
+interface TimeStamps {
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface History extends TimeStamps {
   _id: string;
-  user: User;
-  movie: Movie;
-  progress: number; // e.g., in seconds
-  watchedAt: string;
+  user: string; // User ID
+  movie: Movie | string; // Movie object or Movie ID
+  progress: number; // in seconds
+  watchedAt: string; // Date string
+  isFinished: boolean;
 } 

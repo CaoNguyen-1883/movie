@@ -81,12 +81,19 @@ export function EditMovieModal({ isOpen, onClose, movie }: EditMovieModalProps) 
         : [{ value: '' }];
 
       reset({
-        ...movie,
+        title: movie.title,
+        description: movie.description,
         releaseDate: movie.releaseDate.split('T')[0], // Format date for input
+        duration: movie.duration, // react-hook-form will handle number-to-string conversion
+        status: movie.status,
+        posterUrl: movie.posterUrl,
+        trailerUrl: movie.trailerUrl,
+        videoUrl: movie.videoUrl,
+        backdropUrls: backdrops,
         genres: movie.genres.map(g => g._id),
         directors: movie.directors.map(d => d._id),
-        cast: movie.cast.map(c => ({ actor: c._id, characterName: c.characterName })),
-        backdropUrls: backdrops,
+        // This mapping is crucial to match the form's data structure
+        cast: movie.cast.map(c => ({ actor: c.actor._id, characterName: c.characterName })),
       });
     }
   }, [movie, reset]);

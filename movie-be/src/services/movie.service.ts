@@ -136,16 +136,26 @@ const getMovieById = async (id: string): Promise<IMovie> => {
  * @returns {Promise<IMovie>}
  */
 const updateMovieById = async (movieId: string, updateBody: Partial<IMovie>): Promise<IMovie> => {
-  const movie = await getMovieById(movieId);
   await validateMovieSubDocuments(updateBody);
 
-  // If the title is being updated, and it's different from the old one, regenerate the slug
-  if (updateBody.title && updateBody.title !== movie.title) {
-    updateBody.slug = await generateUniqueSlug(updateBody.title);
+  // If the title is being updated, regenerate the slug
+  // We need to fetch the existing movie to check if title has changed
+  if (updateBody.title) {
+    const existingMovie = await Movie.findById(movieId).select('title').lean();
+    if (existingMovie && updateBody.title !== existingMovie.title) {
+      updateBody.slug = await generateUniqueSlug(updateBody.title);
+    }
+  }
+  
+  const movie = await Movie.findByIdAndUpdate(movieId, updateBody, { new: true, runValidators: true })
+    .populate('genres', 'name')
+    .populate('directors', 'name')
+    .populate('cast.actor', 'name photoUrl');
+
+  if (!movie) {
+    throw new AppError('Movie not found', httpStatus.NOT_FOUND);
   }
 
-  Object.assign(movie, updateBody);
-  await movie.save();
   return movie;
 };
 

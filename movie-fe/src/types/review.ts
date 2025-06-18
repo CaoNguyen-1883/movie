@@ -1,12 +1,14 @@
 import type { User } from './user';
-import type { Movie } from './movie';
 
-export interface Review {
-  _id: string;
-  user: User;
-  movie: Movie;
-  rating: number;
-  content: string;
+interface TimeStamps {
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Review extends TimeStamps {
+  _id: string;
+  user: User;
+  movie: string; // Movie ID
+  rating: number;
+  comment?: string;
 } 
