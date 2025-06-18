@@ -10,6 +10,7 @@ import { VideoPlayerModal } from '@/components/common/VideoPlayerModal';
 import type { Movie } from '@/types/movie';
 import type { Genre } from '@/types/genre';
 import type { Person } from '@/types/person';
+import type { MovieCast } from '@/types/movie';
 
 const MovieDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -170,7 +171,7 @@ const MovieDetailPage = () => {
             <div>
               <h3 className="text-xl font-semibold mb-2">Cast</h3>
               <p className="text-foreground/80">
-                {movie.cast.map((c: Person) => c.name).join(', ')}
+                {movie.cast.map((c: MovieCast) => c.actor.name).join(', ')}
               </p>
             </div>
           )}

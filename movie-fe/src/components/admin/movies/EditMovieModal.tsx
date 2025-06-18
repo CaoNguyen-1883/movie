@@ -85,7 +85,7 @@ export function EditMovieModal({ isOpen, onClose, movie }: EditMovieModalProps) 
         releaseDate: movie.releaseDate.split('T')[0], // Format date for input
         genres: movie.genres.map(g => g._id),
         directors: movie.directors.map(d => d._id),
-        cast: movie.cast.map(c => ({ actor: c.actor._id, characterName: c.characterName })),
+        cast: movie.cast.map(c => ({ actor: c._id, characterName: c.characterName })),
         backdropUrls: backdrops,
       });
     }

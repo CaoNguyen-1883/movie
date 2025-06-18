@@ -101,7 +101,7 @@ export const columns: ColumnDef<Movie>[] = [
       return (
         <div className="flex flex-col gap-1 max-w-xs">
           {cast.slice(0, 3).map(c => ( // show first 3 cast members
-            <span key={c.actor._id} className="text-sm">
+            <span key={c._id} className="text-sm">
               {c.actor.name} <span className="text-muted-foreground">as {c.characterName}</span>
             </span>
           ))}
