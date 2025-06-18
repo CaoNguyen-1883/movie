@@ -17,6 +17,7 @@ import { useAuth } from "@/contexts/AuthContext"
 import { Link } from "react-router-dom"
 import { LogOut, User as UserIcon, Settings, PanelLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ModeToggle } from "@/components/common/ModeToggle"
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -49,44 +50,47 @@ export function Header({ toggleSidebar }: HeaderProps) {
       <div className="relative ml-auto flex-1 md:grow-0">
         {/* Search Bar Placeholder */}
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button className="rounded-full">
-            <Avatar>
-              <AvatarImage src={user.avatarUrl} alt={user.fullName || user.username} />
-              <AvatarFallback>{getInitials(user.fullName)}</AvatarFallback>
-            </Avatar>
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>
-            <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">{user.fullName || user.username}</p>
-              <p className="text-xs leading-none text-muted-foreground">
-                {user.email}
-              </p>
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <Link to="/profile">
-              <UserIcon className="mr-2 h-4 w-4" />
-              <span>Profile</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link to="/settings">
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={logout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Log out</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="flex items-center gap-4">
+        <ModeToggle />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="rounded-full">
+              <Avatar>
+                <AvatarImage src={user.avatarUrl} alt={user.fullName || user.username} />
+                <AvatarFallback>{getInitials(user.fullName)}</AvatarFallback>
+              </Avatar>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium leading-none">{user.fullName || user.username}</p>
+                <p className="text-xs leading-none text-muted-foreground">
+                  {user.email}
+                </p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link to="/profile">
+                <UserIcon className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/settings">
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={logout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </header>
   )
 } 

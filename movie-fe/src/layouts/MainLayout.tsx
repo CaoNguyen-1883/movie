@@ -5,7 +5,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 export function MainLayout() {
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
