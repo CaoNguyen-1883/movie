@@ -151,10 +151,22 @@ const MovieDetailPage = () => {
 
           <div>
             <h2 className="text-2xl font-semibold mb-3 border-b pb-2">
-              Synopsis
+              Description
             </h2>
             <p className="text-foreground/80 leading-relaxed">
               {movie.description}
+            </p>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-2">Release</h3>
+            <p className="text-foreground/80">
+              {new Date(movie.releaseDate).getFullYear()}
+            </p>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-2">Duration</h3>
+            <p className="text-foreground/80">
+              {movie.duration}
             </p>
           </div>
 
