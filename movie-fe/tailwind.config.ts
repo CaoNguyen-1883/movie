@@ -1,5 +1,4 @@
 import type { Config } from 'tailwindcss';
-import tailwindcssAnimate from 'tailwindcss-animate';
 
 const config = {
     darkMode: 'class',
@@ -15,82 +14,38 @@ const config = {
       },
       extend: {
         colors: {
-          // --- Cấu trúc màu đã được tổ chức lại và cập nhật ---
-          border: {
-            DEFAULT: 'hsl(220 13% 91%)',
-            dark: 'hsl(224 32.6% 17.5%)', // Xanh đậm cho viền
-          },
-          input: {
-            DEFAULT: 'hsl(220 13% 91%)',
-            dark: 'hsl(224 32.6% 17.5%)', // Xanh đậm cho input
-          },
-          ring: {
-            DEFAULT: 'hsl(222.2 84% 4.9%)',
-            dark: 'hsl(47.9 95.8% 53.1%)', // Vòng sáng màu vàng khi focus
-          },
-          background: {
-            DEFAULT: 'hsl(0 0% 100%)',
-            dark: 'hsl(224 71.4% 10.2%)', // <-- NỀN XANH NAVY ĐẬM
-          },
-          foreground: {
-            DEFAULT: 'hsl(222.2 84% 4.9%)',
-            dark: 'hsl(210 20% 98%)', // <-- CHỮ TRẮNG NGÀ
-          },
+          border: 'hsl(var(--border))',
+          input: 'hsl(var(--input))',
+          ring: 'hsl(var(--ring))',
+          background: 'hsl(var(--background))',
+          foreground: 'hsl(var(--foreground))',
           primary: {
-            DEFAULT: 'hsl(222.2 47.4% 11.2%)',
-            dark: 'hsl(210 40% 98%)', // Nút chính trong dark mode có nền sáng
-          },
-          'primary-foreground': {
-            DEFAULT: 'hsl(210 40% 98%)',
-            dark: 'hsl(222.2 47.4% 11.2%)', // Chữ trên nút chính trong dark mode
+            DEFAULT: 'hsl(var(--primary))',
+            foreground: 'hsl(var(--primary-foreground))',
           },
           secondary: {
-            DEFAULT: 'hsl(210 40% 96.1%)',
-            dark: 'hsl(224 32.6% 17.5%)',
-          },
-          'secondary-foreground': {
-            DEFAULT: 'hsl(222.2 47.4% 11.2%)',
-            dark: 'hsl(210 20% 98%)',
+            DEFAULT: 'hsl(var(--secondary))',
+            foreground: 'hsl(var(--secondary-foreground))',
           },
           destructive: {
-            DEFAULT: 'hsl(0 84.2% 60.2%)',
-            dark: 'hsl(0 62.8% 30.6%)',
-          },
-          'destructive-foreground': {
-            DEFAULT: 'hsl(210 40% 98%)',
-            dark: 'hsl(0 0% 100%)',
+            DEFAULT: 'hsl(var(--destructive))',
+            foreground: 'hsl(var(--destructive-foreground))',
           },
           muted: {
-            DEFAULT: 'hsl(210 40% 96.1%)',
-            dark: 'hsl(224 32.6% 17.5%)',
-          },
-          'muted-foreground': {
-            DEFAULT: 'hsl(215.4 16.3% 46.9%)',
-            dark: 'hsl(215 20.2% 65.1%)',
+            DEFAULT: 'hsl(var(--muted))',
+            foreground: 'hsl(var(--muted-foreground))',
           },
           accent: {
-            DEFAULT: 'hsl(47.9 95.8% 53.1%)', // <-- MÀU NHẤN VÀNG KIM
-            dark: 'hsl(47.9 95.8% 53.1%)',
-          },
-          'accent-foreground': {
-            DEFAULT: 'hsl(26 83.3% 14.1%)', // <-- Chữ trên nền vàng
-            dark: 'hsl(26 83.3% 14.1%)',
+            DEFAULT: 'hsl(var(--accent))',
+            foreground: 'hsl(var(--accent-foreground))',
           },
           popover: {
-            DEFAULT: 'hsl(0 0% 100%)',
-            dark: 'hsl(224 71.4% 10.2%)',
-          },
-          'popover-foreground': {
-            DEFAULT: 'hsl(222.2 84% 4.9%)',
-            dark: 'hsl(210 20% 98%)',
+            DEFAULT: 'hsl(var(--popover))',
+            foreground: 'hsl(var(--popover-foreground))',
           },
           card: {
-            DEFAULT: 'hsl(0 0% 100%)',
-            dark: 'hsl(224 71.4% 11.2%)', // Card có nền hơi khác background một chút
-          },
-          'card-foreground': {
-            DEFAULT: 'hsl(222.2 84% 4.9%)',
-            dark: 'hsl(210 20% 98%)',
+            DEFAULT: 'hsl(var(--card))',
+            foreground: 'hsl(var(--card-foreground))',
           },
         },
         borderRadius: {
@@ -114,7 +69,7 @@ const config = {
         },
       },
     },
-    plugins: [tailwindcssAnimate],
+    plugins: [],
   } satisfies Config;
   
   
