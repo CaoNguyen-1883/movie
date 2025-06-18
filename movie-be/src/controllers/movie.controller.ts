@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import { catchAsync } from '@/utils/catchAsync';
 import { movieService } from '@/services/movie.service';
 import { pick } from '@/utils/pick';
+import { movieDetailService } from '@/services/movie-detail.service';
 
 const createMovie = catchAsync(async (req: Request, res: Response) => {
   const movie = await movieService.createMovie(req.body);
@@ -11,6 +12,11 @@ const createMovie = catchAsync(async (req: Request, res: Response) => {
     message: 'Movie created successfully.',
     data: movie,
   });
+});
+
+const getMovieBySlug = catchAsync(async (req: Request, res: Response) => {
+  const movie = await movieDetailService.getMovieBySlug(req.params.slug);
+  res.status(httpStatus.OK).send({ success: true, message: 'Movie fetched successfully', data: movie });
 });
 
 const getMovies = catchAsync(async (req: Request, res: Response) => {
@@ -52,6 +58,7 @@ export const movieController = {
   createMovie,
   getMovies,
   getMovie,
+  getMovieBySlug,
   updateMovie,
   deleteMovie,
 }; 

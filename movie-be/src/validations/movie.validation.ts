@@ -47,6 +47,12 @@ const getMovie = {
   }),
 };
 
+const getMovieBySlug = {
+  params: Joi.object().keys({
+    slug: Joi.string().required(),
+  }),
+};
+
 const updateMovie = {
   params: Joi.object().keys({
     movieId: Joi.string().hex().length(24),
@@ -84,6 +90,7 @@ export const movieValidation = {
   createMovie,
   getMovies,
   getMovie,
+  getMovieBySlug,
   updateMovie,
   deleteMovie,
 }; 

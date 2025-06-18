@@ -13,6 +13,10 @@ router
   .get(auth(PermissionType.READ_MOVIES), validate(movieValidation.getMovies), movieController.getMovies);
 
 router
+  .route('/slug/:slug')
+  .get(validate(movieValidation.getMovieBySlug), movieController.getMovieBySlug);
+
+router
   .route('/:movieId')
   .get(auth(PermissionType.READ_MOVIES), validate(movieValidation.getMovie), movieController.getMovie)
   .patch(auth(PermissionType.UPDATE_MOVIES), validate(movieValidation.updateMovie), movieController.updateMovie)

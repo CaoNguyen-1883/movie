@@ -1,10 +1,27 @@
 import httpStatus from 'http-status';
+import slugify from 'slugify';
 import Movie from '@/models/movie.model';
 import { IMovie } from '@/interfaces/movie.interface';
 import { AppError } from '@/utils/AppError';
 import Genre from '@/models/genre.model';
 import Person from '@/models/person.model';
 import mongoose from 'mongoose';
+
+/**
+ * Generates a unique slug. Appends a counter if the slug already exists.
+ * @param {string} title The movie title.
+ * @returns {Promise<string>} A unique slug.
+ */
+const generateUniqueSlug = async (title: string): Promise<string> => {
+  const baseSlug = slugify(title, { lower: true, strict: true });
+  let slug = baseSlug;
+  let counter = 2; // Start counter from 2
+  while (await Movie.exists({ slug })) {
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+  return slug;
+};
 
 /**
  * Validates that the provided IDs for genres, cast, and directors exist in the database.
@@ -39,8 +56,12 @@ const validateMovieSubDocuments = async (movieBody: Partial<IMovie>) => {
  * @returns {Promise<IMovie>}
  */
 const createMovie = async (movieBody: Partial<IMovie>): Promise<IMovie> => {
+  if (!movieBody.title) {
+    throw new AppError('Movie title is required', httpStatus.BAD_REQUEST);
+  }
   await validateMovieSubDocuments(movieBody);
-  return Movie.create(movieBody);
+  const slug = await generateUniqueSlug(movieBody.title);
+  return Movie.create({ ...movieBody, slug });
 };
 
 /**
@@ -117,6 +138,12 @@ const getMovieById = async (id: string): Promise<IMovie> => {
 const updateMovieById = async (movieId: string, updateBody: Partial<IMovie>): Promise<IMovie> => {
   const movie = await getMovieById(movieId);
   await validateMovieSubDocuments(updateBody);
+
+  // If the title is being updated, and it's different from the old one, regenerate the slug
+  if (updateBody.title && updateBody.title !== movie.title) {
+    updateBody.slug = await generateUniqueSlug(updateBody.title);
+  }
+
   Object.assign(movie, updateBody);
   await movie.save();
   return movie;

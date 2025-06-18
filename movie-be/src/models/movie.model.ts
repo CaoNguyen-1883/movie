@@ -26,8 +26,9 @@ const MovieSchema = new Schema<IMovie>(
     },
     slug: {
       type: String,
+      required: true,
       unique: true,
-      lowercase: true,
+      trim: true,
     },
     description: {
       type: String,
