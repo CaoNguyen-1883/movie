@@ -15,5 +15,6 @@ export default {
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.GOOGLE_CALLBACK_URL,
   },
-  nodeEnv: process.env.NODE_ENV || 'development'
+  nodeEnv: process.env.NODE_ENV || 'development',
+  clientUrl: process.env.CLIENT_URL,
 };

@@ -12,6 +12,10 @@ export interface Tokens {
 }
 
 export interface AuthResponse {
-  user: User;
-  tokens: Tokens;
+  success: boolean;
+  message: string;
+  data: {
+    user: User;
+    tokens: Tokens;
+  }
 } 

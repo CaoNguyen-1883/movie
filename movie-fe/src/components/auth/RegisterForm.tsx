@@ -1,8 +1,9 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
+"use client"
 
-import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
@@ -10,49 +11,57 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"; // Assuming shadcn/ui Form components
-import { Input } from "@/components/ui/input"; // Assuming shadcn/ui Input
-import { useAuth } from "@/contexts/AuthContext"; // Updated import path
-// import { useNavigate } from "react-router-dom"; // For redirection
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { register as registerApi } from "@/services/authApi"
+import { useAuth } from "@/contexts/AuthContext"
+import { useNavigate } from "react-router-dom"
+import { useState } from "react"
 
-const registerSchema = z.object({
-  username: z.string().min(3, { message: "Username must be at least 3 characters." }),
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"], // path of error
-});
+const formSchema = z.object({
+  username: z.string().min(3, {
+    message: "Username must be at least 3 characters.",
+  }),
+  email: z.string().email({
+    message: "Invalid email address.",
+  }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters.",
+  }),
+})
 
-type RegisterFormValues = z.infer<typeof registerSchema>;
+export function RegisterForm() {
+  const { login: loginContext } = useAuth();
+  const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
 
-const RegisterForm = () => {
-  const { register, isLoading, error } = useAuth();
-  // const navigate = useNavigate(); // For redirection
-
-  const form = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
       email: "",
       password: "",
-      confirmPassword: "",
     },
-  });
+  })
 
-  const onSubmit = async (data: RegisterFormValues) => {
-    await register(data.username, data.email, data.password);
-    // if (!error) { // Or check based on a successful registration state
-      // form.reset(); // Reset form on successful registration
-      // navigate('/auth'); // Or redirect to login, or show a success message
-      // Consider setting a state in AuthPage to show a success message and switch to login view.
-    // }
-  };
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setError(null);
+    try {
+      const response = await registerApi(values);
+      if (response.success) {
+        // Automatically log the user in after successful registration
+        loginContext(response.data);
+        navigate("/");
+      }
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred.");
+    }
+  }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {error && <p className="text-sm font-medium text-destructive">{error}</p>}
         <FormField
           control={form.control}
           name="username"
@@ -60,7 +69,7 @@ const RegisterForm = () => {
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input placeholder="yourusername" {...field} disabled={isLoading} />
+                <Input placeholder="Your username" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -73,7 +82,7 @@ const RegisterForm = () => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="your@email.com" {...field} disabled={isLoading} />
+                <Input placeholder="m@example.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -86,32 +95,16 @@ const RegisterForm = () => {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} disabled={isLoading} />
+                <Input type="password" placeholder="••••••••" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="confirmPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} disabled={isLoading} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {error && <p className="text-sm font-medium text-destructive">{error.message}</p>}
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Creating account..." : "Create Account"}
+        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? "Registering..." : "Create an account"}
         </Button>
       </form>
     </Form>
-  );
-};
-
-export default RegisterForm; 
+  )
+} 

@@ -1,42 +1,54 @@
-import { useState } from "react";
-import LoginForm from "@/components/auth/LoginForm";
-import RegisterForm from "@/components/auth/RegisterForm";
-import { Button } from "@/components/ui/button"; // Assuming shadcn/ui Button
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"; // Assuming shadcn/ui Card
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
+import { LoginForm } from "@/components/auth/LoginForm"
+import { RegisterForm } from "@/components/auth/RegisterForm"
 
-const AuthPage = () => {
-  const [isLoginView, setIsLoginView] = useState(true);
-
-  const toggleView = () => {
-    setIsLoginView(!isLoginView);
-  };
-
+export function AuthPage() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">
-            {isLoginView ? "Login" : "Create an Account"}
-          </CardTitle>
-          <CardDescription>
-            {isLoginView
-              ? "Welcome back! Please enter your details."
-              : "Fill in the form below to create your account."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoginView ? <LoginForm /> : <RegisterForm />}
-          <div className="mt-4 text-center">
-            <Button variant="link" onClick={toggleView}>
-              {isLoginView
-                ? "Don't have an account? Register"
-                : "Already have an account? Login"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+      <Tabs defaultValue="login" className="w-[400px]">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="login">Login</TabsTrigger>
+          <TabsTrigger value="register">Register</TabsTrigger>
+        </TabsList>
+        <TabsContent value="login">
+          <Card>
+            <CardHeader>
+              <CardTitle>Login</CardTitle>
+              <CardDescription>
+                Enter your credentials to access your account.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <LoginForm />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="register">
+          <Card>
+            <CardHeader>
+              <CardTitle>Register</CardTitle>
+              <CardDescription>
+                Create a new account to get started.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <RegisterForm />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
-  );
-};
-
-export default AuthPage;
+  )
+}

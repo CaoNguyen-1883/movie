@@ -5,6 +5,7 @@ import { authService } from '../services/auth.service';
 import { tokenService } from '../services/token.service';
 import { catchAsync } from '../utils/catchAsync';
 import { IUser } from '@/interfaces/user.interface';
+import config from '@/config/config';
 
 /**
  * Handles the registration of a new local user.
@@ -53,12 +54,20 @@ const refreshTokens = catchAsync(async (req: Request, res: Response) => {
 });
 
 const googleCallback = catchAsync(async (req: Request, res: Response) => {
-  // Passport populates req.user after successful authentication
   const user = req.user as IUser;
   const tokens = await tokenService.generateAuthTokens(user);
-  // You might want to redirect to your frontend with tokens in the query string
-  // For now, just sending them as a response.
-  res.status(httpStatus.OK).send({ user, tokens });
+
+  // Convert user object to a JSON string, then encode it in Base64
+  const userString = JSON.stringify(user.toJSON());
+  const encodedUser = Buffer.from(userString).toString('base64');
+
+  // Construct the redirect URL with all necessary parameters
+  const redirectUrl = new URL(`${config.clientUrl}/auth/google/callback`);
+  redirectUrl.searchParams.set('accessToken', tokens.access.token);
+  redirectUrl.searchParams.set('refreshToken', tokens.refresh.token);
+  redirectUrl.searchParams.set('user', encodedUser); // Send the Base64 encoded user
+
+  res.redirect(redirectUrl.toString());
 });
 
 export const authController = {

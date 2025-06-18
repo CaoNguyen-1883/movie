@@ -17,9 +17,10 @@ import Role from '@/models/role.model';
 const loginUserWithEmailAndPassword = async (email: string, password: string): Promise<IUser> => {
   const user = await User.findOne({ email }).select('+password').populate({
     path: 'roles',
-    model: Role,
-    // If you need to populate permissions within roles:
-    // populate: { path: 'permissions' } 
+    populate: {
+      path: 'permissions',
+      model: 'Permission'
+    }
   });
 
   if (!user || !(await user.comparePassword(password))) {
@@ -30,7 +31,6 @@ const loginUserWithEmailAndPassword = async (email: string, password: string): P
     throw new AppError('User account is disabled', httpStatus.FORBIDDEN);
   }
 
-  // We don't want to return the user object with the password
   user.password = undefined;
 
   return user;

@@ -1,115 +1,95 @@
-import React, { createContext, useState, useContext } from 'react';
-import type { ReactNode } from 'react'; // Import ReactNode as a type
+import type { ReactNode } from 'react';
+import { createContext, useState, useContext, useEffect, useCallback, useMemo } from 'react';
+import type { User } from '@/types/user';
+import type { Tokens, AuthResponse } from '@/types/auth';
+import { logout as logoutApi } from '@/services/authApi';
 
-// Define the shape of the auth context state
+// Type for the data passed to the login function
+type AuthData = AuthResponse['data'];
+
+// Type for the context value
 interface AuthContextType {
+  user: User | null;
+  tokens: Tokens | null;
   isAuthenticated: boolean;
-  user: any; // Replace 'any' with your User type/interface
-  login: (email?: string, password?: string, userData?: any) => Promise<void>; // Added userData for register
-  logout: () => Promise<void>;
-  register: (username?: string, email?: string, password?: string) => Promise<void>;
   isLoading: boolean;
-  error: Error | null;
+  login: (data: AuthData) => void;
+  logout: () => void;
+  hasPermission: (permission: string) => boolean;
 }
 
-// Create the AuthContext with a default undefined value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Define the props for the AuthProvider
-interface AuthProviderProps {
-  children: ReactNode;
-}
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [tokens, setTokens] = useState<Tokens | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-// Create the AuthProvider component
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<any>(null); // Replace 'any' with your User type
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  // Placeholder login function
-  const login = async (email?: string, password?: string) => {
-    setIsLoading(true);
-    setError(null);
-    console.log('Attempting login with:', { email, password });
+  useEffect(() => {
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // Replace with actual API call to your backend /api/auth/login
-      // const response = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, password }),
-      // });
-      // if (!response.ok) throw new Error('Login failed');
-      // const data = await response.json();
-      // setUser(data.user); // Assuming the API returns user info
-      // Store tokens (localStorage, cookies, etc.)
-      setUser({ email }); // Placeholder user
-      setIsAuthenticated(true);
-    } catch (e) {
-      setError(e instanceof Error ? e : new Error('An unknown error occurred during login.'));
-      setIsAuthenticated(false);
+      const storedUser = localStorage.getItem('user');
+      const storedTokens = localStorage.getItem('tokens');
+
+      if (storedUser && storedTokens) {
+        setUser(JSON.parse(storedUser));
+        setTokens(JSON.parse(storedTokens));
+      }
+    } catch (error) {
+      console.error('Failed to parse auth data from localStorage', error);
+      localStorage.removeItem('user');
+      localStorage.removeItem('tokens');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  // Placeholder register function
-  const register = async (username?: string, email?: string, password?: string) => {
-    setIsLoading(true);
-    setError(null);
-    console.log('Attempting registration for:', { username, email });
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // Replace with actual API call to your backend /api/users/register or a dedicated register endpoint
-      // const response = await fetch('/api/auth/register', { // Or whatever your registration endpoint is
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ username, email, password }),
-      // });
-      // if (!response.ok) throw new Error('Registration failed');
-      // const data = await response.json();
-      // setUser(data.user); // Assuming the API returns user info and possibly logs them in
-      // setIsAuthenticated(true); // Or redirect to login
-      console.log('Registration successful (simulated)');
-      // For simplicity, we're not auto-logging in here. User can proceed to login.
-    } catch (e) {
-      setError(e instanceof Error ? e : new Error('An unknown error occurred during registration.'));
-    } finally {
-      setIsLoading(false);
+  const login = useCallback((data: AuthData) => {
+    setUser(data.user);
+    setTokens(data.tokens);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    localStorage.setItem('tokens', JSON.stringify(data.tokens));
+  }, []);
+
+  const logout = useCallback(async () => {
+    if (tokens?.refresh.token) {
+        try {
+            await logoutApi({ refreshToken: tokens.refresh.token });
+        } catch (error) {
+            console.error("Backend logout failed, proceeding with client-side logout.", error);
+        }
     }
-  };
+    setUser(null);
+    setTokens(null);
+    localStorage.removeItem('user');
+    localStorage.removeItem('tokens');
+  }, [tokens]);
 
-  // Placeholder logout function
-  const logout = async () => {
-    setIsLoading(true);
-    setError(null);
-    console.log('Logging out...');
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // Replace with actual API call to your backend /api/auth/logout
-      // await fetch('/api/auth/logout', { method: 'POST' });
-      setUser(null);
-      setIsAuthenticated(false);
-      // Clear tokens
-    } catch (e) {
-      setError(e instanceof Error ? e : new Error('An unknown error occurred during logout.'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const hasPermission = useCallback((requiredPermission: string): boolean => {
+    if (!user || !user.roles) return false;
+    
+    const userPermissions = new Set(
+      user.roles.flatMap(role => 
+        // If role.permissions is missing or undefined, treat it as an empty array to prevent crashing.
+        (role.permissions || []).map(permission => permission.name)
+      )
+    );
+    
+    return userPermissions.has(requiredPermission);
+  }, [user]);
 
-  return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, register, isLoading, error }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const value = useMemo(() => ({
+    user,
+    tokens,
+    isAuthenticated: !!user,
+    isLoading,
+    login,
+    logout,
+    hasPermission,
+  }), [user, tokens, isLoading, login, logout, hasPermission]);
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Create a custom hook to use the AuthContext
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

@@ -1,19 +1,16 @@
-export interface Permission {
-  _id: string;
-  name: string;
-  description: string;
-}
+import type { IRole } from './role';
 
-export interface Role {
-  _id: string;
-  name: string;
-  permissions: Permission[];
-}
 
-export interface User {
+export type User = {
   _id: string;
   username: string;
   email: string;
-  role: Role;
+  fullName?: string;
+  avatarUrl?: string;
+  roles: IRole[];
+  isActive: boolean;
   isEmailVerified: boolean;
-} 
+  createdAt: string;
+  updatedAt: string;
+  authProvider?: 'local' | 'google';
+}; 

@@ -71,3 +71,4 @@ docker-compose.override.yml
 
 # Các file init và seed
 
+.cursor 

@@ -5,6 +5,10 @@ import User from '@/models/user.model';
 import Role from '@/models/role.model';
 import { IUser } from '@/interfaces/user.interface';
 
+// --- DEBUGGING LOG ---
+console.log('[Passport Config] Using Google Callback URL:', config.google.callbackURL);
+// ---------------------
+
 const googleStrategy = new GoogleStrategy(
   {
     clientID: config.google.clientID!,
