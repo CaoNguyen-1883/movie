@@ -36,6 +36,11 @@ export const getMovie = async (movieId: string): Promise<Movie> => {
   return response.data.data;
 };
 
+export const getMovieBySlug = async (slug: string): Promise<Movie> => {
+  const response = await api.get(`/movies/slug/${slug}`);
+  return response.data.data;
+};
+
 export const createMovie = async (movieData: CreateMoviePayload): Promise<Movie> => {
   const response = await api.post('/movies', movieData);
   return response.data.data;

@@ -4,11 +4,7 @@
 import type { Genre } from './genre';
 import type { Person } from './person';
 
-export interface MovieCast {
-  actor: Person;
-  characterName: string;
-  _id?: string;
-}
+export type MovieCast = Person;
 
 export interface Movie {
   _id: string;

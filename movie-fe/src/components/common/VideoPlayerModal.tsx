@@ -40,9 +40,9 @@ export function VideoPlayerModal({ isOpen, onClose, videoUrl, title }: VideoPlay
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[80vw] max-w-[80vw]">
-        <DialogHeader>
-          <DialogTitle>{title || 'Video Player'}</DialogTitle>
+      <DialogContent className="max-w-none sm:max-w-none w-5/7 h-auto aspect-video p-0">
+        <DialogHeader className="p-4 absolute top-0 left-0 bg-gradient-to-b from-black/70 to-transparent w-full">
+          <DialogTitle className="text-white">{title || 'Video Player'}</DialogTitle>
         </DialogHeader>
         <div className="aspect-video">
           {embedUrl ? (
@@ -54,6 +54,7 @@ export function VideoPlayerModal({ isOpen, onClose, videoUrl, title }: VideoPlay
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
+              className="w-full h-full border-none"
             ></iframe>
           ) : (
             <div className="flex items-center justify-center h-full bg-black text-white">
