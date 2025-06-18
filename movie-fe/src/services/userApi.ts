@@ -1,12 +1,13 @@
 import type { User } from '@/types/user';
 import api from '@/lib/axios';
+import type { PaginatedResponse } from '@/types/api';
 
 // We might need a more detailed User type for creation/updates
 // For now, we'll use a generic approach.
 
-export const getUsers = async (params?: any): Promise<{ results: User[], totalResults: number }> => {
+export const getUsers = async (params?: any): Promise<PaginatedResponse<User>> => {
   const response = await api.get('/users', { params });
-  return response.data.data; // Assuming response is { success, message, data: { results, totalResults } }
+  return response.data.data;
 };
 
 export const getUser = async (userId: string): Promise<User> => {

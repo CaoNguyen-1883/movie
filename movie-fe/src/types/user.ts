@@ -2,6 +2,7 @@ import type { IRole } from './role';
 
 
 export type User = {
+  id: string;
   _id: string;
   username: string;
   email: string;

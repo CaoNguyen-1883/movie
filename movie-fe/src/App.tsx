@@ -1,11 +1,17 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { AuthPage } from './pages/AuthPage';
-import { HomePage } from './pages/HomePage';
+import  HomePage  from './pages/HomePage';
 import { AdminPage } from './pages/AdminPage';
 import { GoogleCallbackPage } from './pages/GoogleCallbackPage';
 import { AdminRoute, ProtectedRoute } from './components/common/ProtectedRoute';
 import { MainLayout } from './layouts/MainLayout';
+import UserManagementPage from './pages/admin/UserManagementPage';
+import RoleManagementPage from './pages/admin/RoleManagementPage';
+import GenreManagementPage from './pages/admin/GenreManagementPage';
+import PersonManagementPage from './pages/admin/PersonManagementPage';
+import MovieManagementPage from './pages/admin/MovieManagementPage';
+import MovieDetailPage from './pages/MovieDetailPage';
 
 function App() {
   const { user, isLoading } = useAuth();
@@ -35,10 +41,16 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/movie/:slug" element={<MovieDetailPage />} />
           
           {/* Admin-only routes are also nested inside the MainLayout */}
           <Route element={<AdminRoute />}>
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin/users" element={<UserManagementPage />} />
+            <Route path="/admin/roles" element={<RoleManagementPage />} />
+            <Route path="/admin/genres" element={<GenreManagementPage />} />
+            <Route path="/admin/people" element={<PersonManagementPage />} />
+            <Route path="/admin/movies" element={<MovieManagementPage />} />
           </Route>
           
           {/* We'll add other pages like /profile or /settings here later */}

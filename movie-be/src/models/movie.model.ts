@@ -1,4 +1,4 @@
-import { model, Schema, Types } from 'mongoose';
+import { model, Schema, Types, Document } from 'mongoose';
 import slugify from 'slugify';
 import { IMovie, IMovieCast } from '@/interfaces/movie.interface';
 
@@ -42,6 +42,7 @@ const MovieSchema = new Schema<IMovie>(
       required: true,
     },
     posterUrl: String,
+    backdropUrls: [String],
     trailerUrl: String,
     videoUrl: String,
     genres: [

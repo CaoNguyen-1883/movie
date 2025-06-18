@@ -1,9 +1,15 @@
 import type { Person } from '@/types/person';
+import type { PaginatedResponse } from '@/types/api';
 import api from '@/lib/axios';
 
-export const getPeople = async (params?: any): Promise<{ results: Person[], totalResults: number }> => {
+export const queryPeople = async (params?: any): Promise<PaginatedResponse<Person>> => {
   const response = await api.get('/people', { params });
   return response.data.data;
+};
+
+export const getAllPeople = async (): Promise<Person[]> => {
+  const response = await api.get('/people', { params: { limit: 0 } });
+  return response.data.data.results;
 };
 
 export const getPerson = async (personId: string): Promise<Person> => {

@@ -16,4 +16,11 @@ export const password = (value: string, helpers: CustomHelpers) => {
     return helpers.error('any.invalid', { message: 'Password must contain at least one letter and one number' });
   }
   return value;
+};
+
+export const objectId = (value: string, helpers: CustomHelpers) => {
+  if (!value.match(/^[0-9a-fA-F]{24}$/)) {
+    return helpers.error('any.invalid', { message: '"{#label}" must be a valid mongo id' });
+  }
+  return value;
 }; 

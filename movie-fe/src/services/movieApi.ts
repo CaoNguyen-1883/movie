@@ -1,7 +1,32 @@
-import type { Movie } from '@/types/movie'; // Assuming this type will be created
+import type { Movie, MovieCast } from '@/types/movie';
+import type { PaginatedResponse } from '@/types/api';
 import api from '@/lib/axios';
 
-export const getMovies = async (params?: any): Promise<{ results: Movie[], totalResults: number }> => {
+// This payload represents what the form gives us and what the API expects for creation.
+export type CreateMoviePayload = Omit<
+  Movie,
+  '_id' | 'slug' | 'genres' | 'directors' | 'cast' | 'averageRating' | 'createdAt' | 'updatedAt'
+> & {
+  genres: string[];
+  directors: string[];
+  cast: {
+    actor: string;
+    characterName: string;
+  }[];
+};
+
+// The update payload is similar to the create payload.
+export type UpdateMoviePayload = Partial<CreateMoviePayload>;
+
+export const getMovies = async (
+  params: {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    title?: string;
+    status?: 'NOW_SHOWING' | 'COMING_SOON' | 'RELEASED';
+  } = {}
+): Promise<PaginatedResponse<Movie>> => {
   const response = await api.get('/movies', { params });
   return response.data.data;
 };
@@ -11,12 +36,12 @@ export const getMovie = async (movieId: string): Promise<Movie> => {
   return response.data.data;
 };
 
-export const createMovie = async (movieData: Partial<Movie>): Promise<Movie> => {
+export const createMovie = async (movieData: CreateMoviePayload): Promise<Movie> => {
   const response = await api.post('/movies', movieData);
   return response.data.data;
 };
 
-export const updateMovie = async (movieId: string, updateData: Partial<Movie>): Promise<Movie> => {
+export const updateMovie = async (movieId: string, updateData: UpdateMoviePayload): Promise<Movie> => {
   const response = await api.patch(`/movies/${movieId}`, updateData);
   return response.data.data;
 };

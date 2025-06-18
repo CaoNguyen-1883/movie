@@ -1,9 +1,15 @@
 import type { Genre } from '@/types/genre';
+import type { PaginatedResponse } from '@/types/api';
 import api from '@/lib/axios';
 
-export const getGenres = async (params?: any): Promise<{ results: Genre[], totalResults: number }> => {
+export const queryGenres = async (params?: any): Promise<PaginatedResponse<Genre>> => {
   const response = await api.get('/genres', { params });
   return response.data.data;
+};
+
+export const getAllGenres = async (): Promise<Genre[]> => {
+  const response = await api.get('/genres', { params: { limit: 0 } });
+  return response.data.data.results;
 };
 
 export const getGenre = async (genreId: string): Promise<Genre> => {

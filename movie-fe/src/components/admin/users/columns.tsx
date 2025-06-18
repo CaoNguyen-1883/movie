@@ -7,7 +7,10 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header"
 import { DataTableRowActions } from "./DataTableRowActions"
 
-export const columns: ColumnDef<User>[] = [
+export const getColumns = (
+  onDelete: (id: string) => void,
+  onEdit: (user: User) => void
+): ColumnDef<User>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -31,56 +34,35 @@ export const columns: ColumnDef<User>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "username",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Username" />
-    ),
-    cell: ({ row }) => <div>{row.getValue("username")}</div>,
+    accessorKey: "fullName",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Full Name" />,
+    cell: ({ row }) => <div>{row.original.fullName || row.original.username}</div>,
   },
   {
     accessorKey: "email",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Email" />
-    ),
-    cell: ({ row }) => <div>{row.getValue("email")}</div>,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
   },
   {
     accessorKey: "roles",
     header: "Roles",
-    cell: ({ row }) => {
-      const roles = row.original.roles;
-      return (
-        <div className="flex flex-wrap gap-1">
-          {roles.map((role) => (
-            <Badge key={role._id} variant="outline">{role.name}</Badge>
-          ))}
-        </div>
-      )
-    },
+    cell: ({ row }) => (
+      <div className="flex flex-wrap gap-1">
+        {row.original.roles?.map((role) => (
+          <Badge key={role.id} variant="outline">{role.name}</Badge>
+        ))}
+      </div>
+    ),
     filterFn: (row, id, value) => {
-      return row.original.roles.some(role => value.includes(role.name));
+      return value.includes(row.getValue(id));
     },
-    enableSorting: false,
   },
   {
-    accessorKey: "isActive",
-    header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Status" />
-    ),
-    cell: ({ row }) => {
-        const isActive = row.getValue("isActive");
-        return (
-            <Badge variant={isActive ? "default" : "destructive"}>
-                {isActive ? "Active" : "Inactive"}
-            </Badge>
-        )
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id) ? "Active" : "Inactive");
-    },
+    accessorKey: "createdAt",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
+    cell: ({ row }) => <div>{new Date(row.original.createdAt).toLocaleDateString()}</div>,
   },
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: ({ row }) => <DataTableRowActions row={row} onDelete={onDelete} onEdit={onEdit} />,
   },
 ] 

@@ -3,6 +3,7 @@ import { createContext, useState, useContext, useEffect, useCallback, useMemo } 
 import type { User } from '@/types/user';
 import type { Tokens, AuthResponse } from '@/types/auth';
 import { logout as logoutApi } from '@/services/authApi';
+import { PERMISSIONS } from '@/constants/permissions';
 
 // Type for the data passed to the login function
 type AuthData = AuthResponse['data'];
@@ -16,14 +17,30 @@ interface AuthContextType {
   login: (data: AuthData) => void;
   logout: () => void;
   hasPermission: (permission: string) => boolean;
+  permissions: Set<string>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [tokens, setTokens] = useState<Tokens | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  
+  const permissions = useMemo(() => {
+    if (!user || !user.roles) return new Set<string>();
+    
+    const userPermissions = new Set(
+      user.roles.flatMap(role => 
+        (role.permissions || []).map(permission => permission.name)
+      )
+    );
+    return userPermissions;
+  }, [user]);
+
+  const hasPermission = useCallback((requiredPermission: string): boolean => {
+    return permissions.has(requiredPermission);
+  }, [permissions]);
 
   useEffect(() => {
     try {
@@ -51,7 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('tokens', JSON.stringify(data.tokens));
   }, []);
 
-  const logout = useCallback(async () => {
+  const handleLogout = useCallback(async () => {
     if (tokens?.refresh.token) {
         try {
             await logoutApi({ refreshToken: tokens.refresh.token });
@@ -65,28 +82,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('tokens');
   }, [tokens]);
 
-  const hasPermission = useCallback((requiredPermission: string): boolean => {
-    if (!user || !user.roles) return false;
-    
-    const userPermissions = new Set(
-      user.roles.flatMap(role => 
-        // If role.permissions is missing or undefined, treat it as an empty array to prevent crashing.
-        (role.permissions || []).map(permission => permission.name)
-      )
-    );
-    
-    return userPermissions.has(requiredPermission);
-  }, [user]);
-
   const value = useMemo(() => ({
     user,
     tokens,
-    isAuthenticated: !!user,
+    isAuthenticated: !!tokens,
     isLoading,
     login,
-    logout,
-    hasPermission,
-  }), [user, tokens, isLoading, login, logout, hasPermission]);
+    logout: handleLogout,
+    permissions,
+    hasPermission
+  }), [user, tokens, isLoading, handleLogout, permissions, hasPermission]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

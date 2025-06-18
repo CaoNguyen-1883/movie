@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
-import { catchAsync } from '../utils/catchAsync';
-import { personService } from '../services/person.service';
+import { catchAsync } from '@/utils/catchAsync';
+import { personService } from '@/services/person.service';
+import { pick } from '@/utils/pick';
 
 const createPerson = catchAsync(async (req: Request, res: Response) => {
   const person = await personService.createPerson(req.body);
@@ -13,7 +14,9 @@ const createPerson = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getPeople = catchAsync(async (req: Request, res: Response) => {
-  const result = await personService.getPeople();
+  const filter = pick(req.query, ['name']);
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const result = await personService.queryPeople(filter, options);
   res.send({
     success: true,
     data: result,

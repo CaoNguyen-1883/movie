@@ -4,8 +4,9 @@ import { NavLink } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import { PERMISSIONS } from "@/constants/permissions"
 import { cn } from "@/lib/utils"
-import { Home, Shield, Video, Users } from "lucide-react"
+import { Home, Shield, Video, Users, ShieldCheck, Library, Contact, Clapperboard } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { AuthContext } from '@/contexts/AuthContext'
 
 interface SidebarProps {
   isSidebarOpen: boolean;
@@ -15,18 +16,31 @@ export function Sidebar({ isSidebarOpen }: SidebarProps) {
   const { hasPermission } = useAuth()
   const isAdmin = hasPermission(PERMISSIONS.VIEW_DASHBOARD)
 
-  const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
-    cn(
-      "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-      { "bg-muted text-primary": isActive },
-      { "justify-center": !isSidebarOpen } // Center items when collapsed
-    );
-  
-  const NavItem = ({ to, end = false, icon, label }: { to: string, end?: boolean, icon: React.ReactNode, label: string }) => (
+  const NavItem = ({
+    to,
+    end = false,
+    icon,
+    label,
+  }: {
+    to: string;
+    end?: boolean;
+    icon: React.ReactNode;
+    label: string;
+  }) => (
     <TooltipProvider delayDuration={100}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <NavLink to={to} end={end} className={navLinkClasses}>
+          <NavLink
+            to={to}
+            end={end}
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary',
+                { 'bg-muted text-primary': isActive },
+                { 'justify-center': !isSidebarOpen }
+              )
+            }
+          >
             {icon}
             {isSidebarOpen && <span>{label}</span>}
           </NavLink>
@@ -54,8 +68,41 @@ export function Sidebar({ isSidebarOpen }: SidebarProps) {
           
           {isAdmin && (
             <>
-              <NavItem to="/admin" end icon={<Shield className="h-4 w-4" />} label="Dashboard" />
-              <NavItem to="/admin/users" icon={<Users className="h-4 w-4" />} label="Users" />
+              <NavItem
+                to="/admin"
+                end
+                icon={<Shield className="h-4 w-4" />}
+                label="Dashboard"
+              />
+              <NavItem
+                to="/admin/users"
+                icon={<Users className="h-4 w-4" />}
+                label="Users"
+              />
+              <NavItem
+                to="/admin/roles"
+                icon={<ShieldCheck className="h-4 w-4" />}
+                label="Roles"
+              />
+              <NavItem
+                to="/admin/genres"
+                icon={<Library className="h-4 w-4" />}
+                label="Genres"
+              />
+              {hasPermission(PERMISSIONS.READ_PEOPLE) && (
+                <NavItem
+                  to="/admin/people"
+                  icon={<Contact className="h-4 w-4" />}
+                  label="People"
+                />
+              )}
+              {hasPermission(PERMISSIONS.READ_MOVIES) && (
+                <NavItem
+                  to="/admin/movies"
+                  icon={<Clapperboard className="h-4 w-4" />}
+                  label="Movies"
+                />
+              )}
             </>
           )}
         </nav>

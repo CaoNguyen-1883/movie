@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import type {
+  ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
@@ -16,6 +17,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
+import { useQuery } from "@tanstack/react-query"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -25,51 +28,84 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { DataTablePagination } from "@/components/ui/data-table/data-table-pagination"
-import { useQuery } from "@tanstack/react-query"
 import { getUsers } from "@/services/userApi"
-import { columns } from "./columns"
+import { useDebounce } from "@/hooks/useDebounce"
 
-export function UsersTable() {
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+}
+
+export function UsersTable<TData, TValue>({ columns }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [sorting, setSorting] = React.useState<SortingState>([])
+  const [searchTerm, setSearchTerm] = React.useState('')
+  const debouncedSearchTerm = useDebounce(searchTerm, 500)
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['users'],
-    queryFn: () => getUsers(),
+  const [{ pageIndex, pageSize }, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  })
+
+  const pagination = React.useMemo(
+    () => ({
+      pageIndex,
+      pageSize,
+    }),
+    [pageIndex, pageSize]
+  )
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['users', pagination, sorting, debouncedSearchTerm],
+    queryFn: () =>
+      getUsers({
+        page: pagination.pageIndex + 1,
+        limit: pagination.pageSize,
+        sortBy: sorting.map(s => `${s.id}:${s.desc ? 'desc' : 'asc'}`).join(',') || undefined,
+        search: debouncedSearchTerm || undefined,
+      }),
   })
   
-  const tableData = data?.results || [];
+  const defaultData = React.useMemo(() => [], [])
 
   const table = useReactTable({
-    data: tableData,
+    data: (data?.results as TData[]) ?? defaultData,
     columns,
+    pageCount: data?.totalPages ?? -1,
     state: {
       sorting,
       columnVisibility,
       rowSelection,
       columnFilters,
+      pagination,
     },
-    enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    manualPagination: true,
+    manualSorting: true,
+    manualFiltering: true,
   })
-
-  if (isLoading) return <div>Loading users...</div>
-  if (error) return <div>An error occurred: {error.message}</div>
 
   return (
     <div className="space-y-4">
-      {/* TODO: Add DataTableToolbar here */}
+      <div className="flex items-center justify-between">
+        <Input
+          placeholder="Filter users..."
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
+          className="max-w-sm"
+        />
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -91,7 +127,19 @@ export function UsersTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  Loading...
+                </TableCell>
+              </TableRow>
+            ) : isError ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center text-red-500">
+                  {error instanceof Error ? error.message : 'An unknown error occurred'}
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}

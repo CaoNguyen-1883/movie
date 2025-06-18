@@ -54,20 +54,28 @@ const queryMovies = async (filter: any, options: any): Promise<any> => {
   const page = options.page && parseInt(options.page, 10) > 0 ? parseInt(options.page, 10) : 1;
   const skip = (page - 1) * limit;
 
+  const query: any = {};
+  if (filter.title) {
+    query.title = { $regex: filter.title, $options: 'i' };
+  }
+  // We're reverting the status filter for now to restore stability
+  // if (filter.status) {
+  //   query.status = filter.status;
+  // }
+
   const sort: { [key: string]: 'asc' | 'desc' } = {};
   if (options.sortBy) {
     const [key, order] = options.sortBy.split(':');
     sort[key] = order === 'desc' ? 'desc' : 'asc';
   } else {
-    // Default sort by creation date
     sort.createdAt = 'desc';
   }
 
-  const totalResults = await Movie.countDocuments(filter).exec();
-  const movies = await Movie.find(filter)
-    .populate('genres', 'name')
-    .populate('directors', 'name')
-    .populate('cast.actor', 'name')
+  const totalResults = await Movie.countDocuments(query).exec();
+  const movies = await Movie.find(query)
+    .populate('genres', 'name slug')
+    .populate('directors', 'name slug')
+    .populate('cast.actor', 'name slug')
     .sort(sort)
     .skip(skip)
     .limit(limit)

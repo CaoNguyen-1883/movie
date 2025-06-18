@@ -18,4 +18,10 @@ export interface AuthResponse {
     user: User;
     tokens: Tokens;
   }
+}
+
+export interface RefreshAuthResponse {
+  success: boolean;
+  message: string;
+  data: Tokens;
 } 
