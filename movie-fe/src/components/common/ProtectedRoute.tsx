@@ -26,5 +26,5 @@ export const ProtectedRoute = ({ requiredPermission }: ProtectedRouteProps) => {
 
 // Example usage for an admin-only route
 export const AdminRoute = () => {
-    return <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_USERS} />
+    return <ProtectedRoute requiredPermission={PERMISSIONS.READ_USERS} />
 } 

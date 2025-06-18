@@ -15,9 +15,14 @@ import {
 } from "@/components/ui/avatar"
 import { useAuth } from "@/contexts/AuthContext"
 import { Link } from "react-router-dom"
-import { LogOut, User as UserIcon, Settings } from "lucide-react"
+import { LogOut, User as UserIcon, Settings, PanelLeft } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
-export function Header() {
+interface HeaderProps {
+  toggleSidebar: () => void;
+}
+
+export function Header({ toggleSidebar }: HeaderProps) {
   const { user, logout } = useAuth()
 
   if (!user) {
@@ -36,7 +41,11 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-      {/* We can add a search bar or breadcrumbs here later */}
+      <Button size="icon" variant="outline" onClick={toggleSidebar}>
+        <PanelLeft className="h-5 w-5" />
+        <span className="sr-only">Toggle Menu</span>
+      </Button>
+      
       <div className="relative ml-auto flex-1 md:grow-0">
         {/* Search Bar Placeholder */}
       </div>

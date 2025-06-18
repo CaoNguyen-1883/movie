@@ -1,33 +1,52 @@
+/**
+ * This file should be kept in sync with the `PermissionType` enum in the backend.
+ * @see /movie-be/src/interfaces/permission.interface.ts
+ */
 export const PERMISSIONS = {
   // User Management
-  MANAGE_USERS: 'manageUsers',
-  GET_USERS: 'getUsers',
+  CREATE_USERS: 'CREATE_USERS',
+  READ_USERS: 'READ_USERS',
+  UPDATE_USERS: 'UPDATE_USERS',
+  DELETE_USERS: 'DELETE_USERS',
 
   // Role Management
-  MANAGE_ROLES: 'manageRoles',
-  GET_ROLES: 'getRoles',
+  CREATE_ROLES: 'CREATE_ROLES',
+  READ_ROLES: 'READ_ROLES',
+  UPDATE_ROLES: 'UPDATE_ROLES',
+  DELETE_ROLES: 'DELETE_ROLES',
 
   // Permission Management
-  MANAGE_PERMISSIONS: 'managePermissions',
-  GET_PERMISSIONS: 'getPermissions',
+  READ_PERMISSIONS: 'READ_PERMISSIONS',
 
   // Movie Management
-  MANAGE_MOVIES: 'manageMovies',
-  GET_MOVIES: 'getMovies',
+  CREATE_MOVIES: 'CREATE_MOVIES',
+  READ_MOVIES: 'READ_MOVIES',
+  UPDATE_MOVIES: 'UPDATE_MOVIES',
+  DELETE_MOVIES: 'DELETE_MOVIES',
 
   // Genre Management
-  MANAGE_GENRES: 'manageGenres',
-  GET_GENRES: 'getGenres',
-  
-  // Person Management
-  MANAGE_PEOPLE: 'managePeople',
-  GET_PEOPLE: 'getPeople',
+  CREATE_GENRES: 'CREATE_GENRES',
+  READ_GENRES: 'READ_GENRES',
+  UPDATE_GENRES: 'UPDATE_GENRES',
+  DELETE_GENRES: 'DELETE_GENRES',
+
+  // Person (Actor/Director) Management
+  CREATE_PEOPLE: 'CREATE_PEOPLE',
+  READ_PEOPLE: 'READ_PEOPLE',
+  UPDATE_PEOPLE: 'UPDATE_PEOPLE',
+  DELETE_PEOPLE: 'DELETE_PEOPLE',
 
   // Review Management
-  MANAGE_REVIEWS: 'manageReviews',
-  GET_REVIEWS: 'getReviews',
+  DELETE_ANY_REVIEW: 'DELETE_ANY_REVIEW',
+  CREATE_OWN_REVIEW: 'CREATE_OWN_REVIEW',
+  READ_REVIEWS: 'READ_REVIEWS',
+  DELETE_REVIEWS: 'DELETE_REVIEWS',
 
-  // History Management
-  MANAGE_HISTORY: 'manageHistory',
-  GET_HISTORY: 'getHistory',
+  // Dashboard
+  VIEW_DASHBOARD: 'VIEW_DASHBOARD',
+
+  // History Permissions
+  READ_OWN_HISTORY: 'READ_OWN_HISTORY',
+  UPDATE_OWN_HISTORY: 'UPDATE_OWN_HISTORY',
+  DELETE_OWN_HISTORY: 'DELETE_OWN_HISTORY',
 }; 

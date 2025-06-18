@@ -45,6 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = useCallback((data: AuthData) => {
     setUser(data.user);
+    console.log(data.user);
     setTokens(data.tokens);
     localStorage.setItem('user', JSON.stringify(data.user));
     localStorage.setItem('tokens', JSON.stringify(data.tokens));

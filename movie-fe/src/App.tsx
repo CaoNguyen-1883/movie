@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { AuthPage } from './pages/AuthPage';
 import { HomePage } from './pages/HomePage';
@@ -27,14 +27,21 @@ function App() {
         element={user ? <Navigate to="/" replace /> : <AuthPage />} 
       />
 
-      {/* Protected Routes with MainLayout */}
+      {/* 
+        This is the main protected area of the app.
+        All routes inside will first check for an authenticated user.
+        Then, they will be rendered inside the MainLayout.
+      */}
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
+          
+          {/* Admin-only routes are also nested inside the MainLayout */}
           <Route element={<AdminRoute />}>
             <Route path="/admin" element={<AdminPage />} />
           </Route>
-          {/* Add other general protected routes here, inside MainLayout */}
+          
+          {/* We'll add other pages like /profile or /settings here later */}
         </Route>
       </Route>
 

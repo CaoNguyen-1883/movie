@@ -6,6 +6,7 @@ import { tokenService } from '../services/token.service';
 import { catchAsync } from '../utils/catchAsync';
 import { IUser } from '@/interfaces/user.interface';
 import config from '@/config/config';
+import User from '@/models/user.model';
 
 /**
  * Handles the registration of a new local user.
@@ -54,7 +55,22 @@ const refreshTokens = catchAsync(async (req: Request, res: Response) => {
 });
 
 const googleCallback = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user as IUser;
+  const googleUser = req.user as IUser;
+
+  // Re-fetch the user from the database to apply the necessary population
+  const user = await User.findById(googleUser._id).populate({
+    path: 'roles',
+    populate: {
+      path: 'permissions',
+      model: 'Permission'
+    }
+  });
+
+  if (!user) {
+    // This should ideally not happen if the passport strategy is correct
+    return res.redirect(`${config.clientUrl}/auth?error=UserNotFound`);
+  }
+
   const tokens = await tokenService.generateAuthTokens(user);
 
   // Convert user object to a JSON string, then encode it in Base64
