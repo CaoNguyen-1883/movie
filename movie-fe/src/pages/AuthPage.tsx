@@ -14,9 +14,9 @@ import {
 import { LoginForm } from "@/components/auth/LoginForm"
 import { RegisterForm } from "@/components/auth/RegisterForm"
 
-export function AuthPage() {
+const AuthPage = () => {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
       <Tabs defaultValue="login" className="w-[400px]">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="login">Login</TabsTrigger>
@@ -40,7 +40,7 @@ export function AuthPage() {
             <CardHeader>
               <CardTitle>Register</CardTitle>
               <CardDescription>
-                Create a new account to get started.
+                Enter your details to create a new account.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -52,3 +52,5 @@ export function AuthPage() {
     </div>
   )
 }
+
+export default AuthPage

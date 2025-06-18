@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
-import { AuthPage } from './pages/AuthPage';
+import  AuthPage  from './pages/AuthPage';
 import  HomePage  from './pages/HomePage';
 import { AdminPage } from './pages/AdminPage';
 import { GoogleCallbackPage } from './pages/GoogleCallbackPage';
