@@ -13,6 +13,15 @@ const createReview = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMyReviews = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user as IUser;
+  const reviews = await reviewService.getReviewsByUserId(user._id);
+  res.send({
+    success: true,
+    data: reviews,
+  });
+});
+
 const getReviewsByMovie = catchAsync(async (req: Request, res: Response) => {
   const reviews = await reviewService.getReviewsByMovie(req.params.movieId);
   res.send({
@@ -40,6 +49,7 @@ const deleteReview = catchAsync(async (req: Request, res: Response) => {
 
 export const reviewController = {
   createReview,
+  getMyReviews,
   getReviewsByMovie,
   updateReview,
   deleteReview,

@@ -1,10 +1,12 @@
 import httpStatus from 'http-status';
 import User from '@/models/user.model';
-import { IUser } from '@/interfaces/user.interface';
+import { IUser, IUserMethods } from '@/interfaces/user.interface';
 import { Token } from '@/models/token.model';
 import { AppError } from '@/utils/AppError';
 import { tokenService } from './token.service';
 import { TokenTypes } from '@/config/tokens';
+import Role from '@/models/role.model';
+import { Types } from 'mongoose';
 
 /**
  * Login with username/email and password.
@@ -13,18 +15,24 @@ import { TokenTypes } from '@/config/tokens';
  * @returns {Promise<IUser>} The user object if login is successful.
  * @throws {AppError} If login fails.
  */
-const loginUserWithEmailAndPassword = async (emailOrUsername: string, password: string) => {
-  const user = await User.findOne({
-    $or: [{ email: emailOrUsername.toLowerCase() }, { username: emailOrUsername.toLowerCase() }],
-  }).select('+password');
+const loginUserWithEmailAndPassword = async (email: string, password: string): Promise<IUser> => {
+  const user = await User.findOne({ email }).select('+password').populate({
+    path: 'roles',
+    populate: {
+      path: 'permissions',
+      model: 'Permission'
+    }
+  });
 
   if (!user || !(await user.comparePassword(password))) {
-    throw new AppError('Incorrect email/username or password', httpStatus.UNAUTHORIZED);
+    throw new AppError('Incorrect email or password', httpStatus.UNAUTHORIZED);
   }
 
   if (!user.isActive) {
     throw new AppError('User account is disabled', httpStatus.FORBIDDEN);
   }
+
+  user.password = undefined;
 
   return user;
 };
@@ -67,8 +75,20 @@ const refreshAuth = async (refreshToken: string) => {
   }
 };
 
+const changePassword = async (userId: Types.ObjectId, currentPassword: string, newPassword: string): Promise<void> => {
+  const user = await User.findById(userId).select('+password');
+  if (!user || !(await (user as IUser & IUserMethods).isPasswordMatch(currentPassword))) {
+    throw new AppError('Incorrect current password', httpStatus.UNAUTHORIZED);
+  }
+
+  // User model's pre-save hook will hash the new password
+  user.password = newPassword;
+  await user.save();
+};
+
 export const authService = {
   loginUserWithEmailAndPassword,
   logout,
   refreshAuth,
+  changePassword,
 }; 

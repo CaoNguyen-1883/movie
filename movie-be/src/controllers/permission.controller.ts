@@ -4,7 +4,10 @@ import { catchAsync } from '@/utils/catchAsync';
 
 const getPermissions = catchAsync(async (req: Request, res: Response) => {
   const permissions = await permissionService.getPermissions();
-  res.send(permissions);
+  res.send({
+    success: true,
+    data: permissions,
+  });
 });
 
 export const permissionController = {

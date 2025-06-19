@@ -20,8 +20,18 @@ const UserSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: true,
-      select: false, // Hide password by default
+      required: false, // Not required for OAuth users
+      select: false,
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true, // Allows multiple null values
+    },
+    authProvider: {
+      type: String,
+      enum: ['local', 'google'],
+      default: 'local',
     },
     fullName: {
       type: String,

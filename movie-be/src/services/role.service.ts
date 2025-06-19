@@ -21,7 +21,7 @@ const createRole = async (roleBody: Partial<IRole>): Promise<IRole> => {
  * @returns {Promise<IRole[]>} A list of all roles.
  */
 const getRoles = async (): Promise<IRole[]> => {
-  return Role.find({});
+  return Role.find({}).populate('permissions');
 };
 
 /**
@@ -30,7 +30,7 @@ const getRoles = async (): Promise<IRole[]> => {
  * @returns {Promise<IRole | null>} The role document or null.
  */
 const getRoleById = async (id: string): Promise<IRole | null> => {
-  return Role.findById(id);
+  return Role.findById(id).populate('permissions');
 };
 
 /**

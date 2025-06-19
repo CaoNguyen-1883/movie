@@ -16,8 +16,10 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getUsers = catchAsync(async (req: Request, res: Response) => {
-  const filter = pick(req.query, ['username', 'role']);
-  const result = await userService.queryUsers(filter);
+  const filter = pick(req.query, ['role']);
+  const options = pick(req.query, ['sortBy', 'limit', 'page', 'search']);
+
+  const result = await userService.queryUsers(filter, options);
   res.send({
     success: true,
     data: result,
@@ -53,7 +55,7 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMe = catchAsync(async (req: Request, res: Response) => {
-  // The 'auth' middleware ensures req.user is defined.
+  // req.user is populated by the auth middleware
   res.send({
     success: true,
     data: req.user,
@@ -61,13 +63,10 @@ const getMe = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateMe = catchAsync(async (req: Request, res: Response) => {
-  // The 'auth' middleware ensures req.user is defined.
-  // We explicitly cast req.user to IUser to resolve the stubborn compiler error.
-  const userId = (req.user as IUser)._id;
-  const user = await userService.updateUserById(userId.toString(), req.body);
+  const user = await userService.updateUserById((req.user as IUser)._id.toString(), req.body);
   res.send({
     success: true,
-    message: 'Your details updated successfully.',
+    message: 'Profile updated successfully.',
     data: user,
   });
 });

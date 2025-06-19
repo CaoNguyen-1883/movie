@@ -4,6 +4,9 @@ import { IUser } from '@/interfaces/user.interface';
 import Role from '@/models/role.model';
 import { AppError } from '@/utils/AppError';
 
+// Define a more specific type for the update payload
+type UserUpdatePayload = Omit<Partial<IUser>, 'roles'> & { roles?: string[] };
+
 /**
  * Create a user (typically by an admin).
  * @param {object} userBody - The user data.
@@ -31,12 +34,52 @@ export const createUser = async (userBody: Partial<IUser>): Promise<IUser> => {
 };
 
 /**
- * Query for users.
- * @param {object} filter - Mongo filter.
- * @returns {Promise<IUser[]>}
+ * Query for users with pagination and search.
+ * @param {object} filter - Mongo filter for fields like 'role'.
+ * @param {object} options - Query options
+ * @param {string} [options.sortBy] - Sort option in the format: "field:desc"
+ * @param {number} [options.limit] - Maximum number of results per page.
+ * @param {number} [options.page] - Current page.
+ * @param {string} [options.search] - Search term for username or email.
+ * @returns {Promise<object>} - Object containing results and pagination info.
  */
-export const queryUsers = async (filter: any): Promise<IUser[]> => {
-  return User.find(filter).populate('roles');
+export const queryUsers = async (filter: any, options: any) => {
+  const { limit = 10, page = 1, sortBy, search } = options;
+  const skip = (page - 1) * limit;
+
+  const query: any = { ...filter };
+
+  if (search) {
+    const searchRegex = new RegExp(search, 'i');
+    query.$or = [
+      { username: { $regex: searchRegex } },
+      { email: { $regex: searchRegex } },
+    ];
+  }
+  
+  const [field, order] = sortBy ? sortBy.split(':') : ['createdAt', 'desc'];
+  const sort: { [key: string]: 1 | -1 } = { [field]: order === 'desc' ? -1 : 1 };
+
+  const usersPromise = User.find(query)
+    .populate({
+      path: 'roles',
+      populate: { path: 'permissions' },
+    })
+    .sort(sort)
+    .skip(skip)
+    .limit(limit);
+    
+  const totalPromise = User.countDocuments(query);
+
+  const [results, totalResults] = await Promise.all([usersPromise, totalPromise]);
+
+  return {
+    results,
+    page,
+    limit,
+    totalPages: Math.ceil(totalResults / limit),
+    totalResults,
+  };
 };
 
 /**
@@ -45,7 +88,13 @@ export const queryUsers = async (filter: any): Promise<IUser[]> => {
  * @returns {Promise<IUser | null>} The user document or null if not found.
  */
 export const findUserById = async (id: string): Promise<IUser | null> => {
-  return User.findById(id).populate('roles');
+  return User.findById(id).populate({
+    path: 'roles',
+    populate: {
+      path: 'permissions',
+      model: 'Permission'
+    }
+  });
 };
 
 /**
@@ -55,7 +104,7 @@ export const findUserById = async (id: string): Promise<IUser | null> => {
  * @returns {Promise<IUser>} The updated user document.
  * @throws {AppError} If user is not found or email/username is already taken.
  */
-export const updateUserById = async (userId: string, updateBody: Partial<IUser>): Promise<IUser> => {
+export const updateUserById = async (userId: string, updateBody: UserUpdatePayload): Promise<IUser> => {
   const user = await findUserById(userId);
   if (!user) {
     throw new AppError('User not found', httpStatus.NOT_FOUND);
@@ -79,6 +128,13 @@ export const updateUserById = async (userId: string, updateBody: Partial<IUser>)
 
   Object.assign(user, updateBody);
   await user.save();
+  await user.populate({
+    path: 'roles',
+    populate: {
+      path: 'permissions',
+      model: 'Permission'
+    }
+  });
   return user;
 };
 

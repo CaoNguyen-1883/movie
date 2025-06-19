@@ -8,11 +8,10 @@ import { IRole } from '@/interfaces/role.interface';
 import { AppError } from '@/utils/AppError';
 import { TokenTypes } from '@/config/tokens';
 import { Request, Response, NextFunction } from 'express';
-import Permission from '@/models/permission.model';
-import { Types } from 'mongoose';
+import { IPermission } from '@/interfaces/permission.interface';
 
 const jwtOptions = {
-  secretOrKey: config.jwtSecret,
+  secretOrKey: config.jwt.secret,
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 };
 
@@ -28,8 +27,14 @@ const jwtVerify: VerifyCallback = async (payload, done) => {
     if (payload.type !== TokenTypes.ACCESS) {
       return done(new AppError('Invalid token type', httpStatus.UNAUTHORIZED), false);
     }
-    // Find user and populate their roles
-    const user = await User.findById(payload.sub).populate('roles');
+    // Deep populate user's roles and the permissions within those roles
+    const user = await User.findById(payload.sub).populate({
+      path: 'roles',
+      populate: {
+        path: 'permissions',
+        model: 'Permission',
+      },
+    });
     if (!user) {
       return done(null, false);
     }
@@ -47,48 +52,49 @@ export const jwtStrategy = new JwtStrategy(jwtOptions, jwtVerify);
  * @param {...string} requiredPermissions - The list of required permissions.
  * @returns An authentication middleware.
  */
-export const auth = (...requiredPermissions: string[]) => (req: Request, res: Response, next: NextFunction) => {
-  passport.authenticate('jwt', { session: false }, async (err: Error, user: IUser, info: any) => {
-    try {
-      if (err || info || !user) {
-        return next(new AppError('Please authenticate', httpStatus.UNAUTHORIZED));
+export const auth =
+  (...requiredPermissions: string[]) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    passport.authenticate('jwt', { session: false }, async (err: Error, user: IUser, info: any) => {
+      try {
+        if (err || info || !user) {
+          return next(new AppError('Please authenticate', httpStatus.UNAUTHORIZED));
+        }
+
+        req.user = user;
+
+        if (requiredPermissions.length > 0) {
+          const userPermissionNames = new Set<string>();
+          const populatedRoles = user.roles as unknown as IRole[];
+
+          if (populatedRoles && Array.isArray(populatedRoles)) {
+            populatedRoles.forEach((role) => {
+              if (role.permissions && Array.isArray(role.permissions)) {
+                // After deep population, each element is a full IPermission object.
+                // We can directly access the name property.
+                role.permissions.forEach((permission) => {
+                  // Cast to unknown first, then to IPermission to satisfy TypeScript
+                  userPermissionNames.add((permission as unknown as IPermission).name);
+                });
+              }
+            });
+          }
+
+          const hasRequiredPermissions = requiredPermissions.every((requiredPerm) =>
+            userPermissionNames.has(requiredPerm)
+          );
+
+          if (!hasRequiredPermissions) {
+            const message = `Forbidden: You do not have the required permission(s): ${requiredPermissions.join(
+              ', '
+            )}`;
+            return next(new AppError(message, httpStatus.FORBIDDEN));
+          }
+        }
+
+        return next();
+      } catch (error) {
+        return next(error);
       }
-
-      req.user = user;
-
-      if (requiredPermissions.length) {
-        const userPermissionIds = new Set<string>();
-        // After .populate('roles'), user.roles is an array of IRole objects
-        const populatedRoles = user.roles as unknown as IRole[];
-
-        if (populatedRoles && Array.isArray(populatedRoles)) {
-          populatedRoles.forEach((role) => {
-            if (role.permissions && Array.isArray(role.permissions)) {
-              role.permissions.forEach((permissionId: Types.ObjectId) => {
-                userPermissionIds.add(permissionId.toString());
-              });
-            }
-          });
-        }
-
-        const requiredPermsDocs = await Permission.find({ name: { $in: requiredPermissions } });
-
-        if (requiredPermsDocs.length !== requiredPermissions.length) {
-          // This indicates a misconfiguration in a route's required permissions
-          return next(new AppError('Invalid permission defined for this route', httpStatus.INTERNAL_SERVER_ERROR));
-        }
-
-        const hasRequiredPermissions = requiredPermsDocs.length > 0 && requiredPermsDocs.some((perm) => userPermissionIds.has(perm._id.toString()));
-
-        if (!hasRequiredPermissions) {
-          const message = `Forbidden: You do not have the required permission(s): ${requiredPermissions.join(', ')}`;
-          return next(new AppError(message, httpStatus.FORBIDDEN));
-        }
-      }
-
-      return next();
-    } catch (error) {
-      return next(error);
-    }
-  })(req, res, next);
-}; 
+    })(req, res, next);
+  }; 

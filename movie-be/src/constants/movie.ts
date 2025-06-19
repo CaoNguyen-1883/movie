@@ -1,0 +1,1 @@
+export const movieStatus = ['COMING_SOON', 'NOW_SHOWING', 'RELEASED']; 

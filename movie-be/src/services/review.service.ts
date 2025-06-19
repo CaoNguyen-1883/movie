@@ -46,7 +46,16 @@ const createReview = async (
  * @returns {Promise<IReview[]>}
  */
 const getReviewsByMovie = async (movieId: string): Promise<IReview[]> => {
-  return Review.find({ movie: movieId }).populate('user', 'username avatarUrl');
+  return Review.find({ movie: movieId }).populate('user', '_id fullName username avatarUrl');
+};
+
+/**
+ * Get reviews by user ID
+ * @param {string} userId
+ * @returns {Promise<IReview[]>}
+ */
+const getReviewsByUserId = async (userId: Types.ObjectId): Promise<IReview[]> => {
+  return Review.find({ user: userId }).populate('movie', 'title slug posterUrl');
 };
 
 /**
@@ -101,6 +110,7 @@ const deleteReviewById = async (reviewId: string, user: IUser): Promise<void> =>
 export const reviewService = {
   createReview,
   getReviewsByMovie,
+  getReviewsByUserId,
   updateReviewById,
   deleteReviewById,
 }; 

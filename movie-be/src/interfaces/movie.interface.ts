@@ -12,6 +12,7 @@ export interface IMovie extends Document {
   releaseDate: Date;
   duration: number; // in minutes
   posterUrl?: string;
+  backdropUrls?: string[];
   trailerUrl?: string;
   videoUrl?: string;
   genres: Types.ObjectId[]; // Ref to Genre

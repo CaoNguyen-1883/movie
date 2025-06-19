@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import { catchAsync } from '@/utils/catchAsync';
 import { genreService } from '@/services/genre.service';
+import { pick } from '@/utils/pick';
 
 const createGenre = catchAsync(async (req: Request, res: Response) => {
   const genre = await genreService.createGenre(req.body);
@@ -13,7 +14,9 @@ const createGenre = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getGenres = catchAsync(async (req: Request, res: Response) => {
-  const result = await genreService.getGenres();
+  const filter = pick(req.query, ['name']);
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const result = await genreService.queryGenres(filter, options);
   res.send({
     success: true,
     data: result,

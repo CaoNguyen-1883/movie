@@ -7,6 +7,11 @@ import { PermissionType } from '@/interfaces/permission.interface';
 
 const router = express.Router();
 
+router
+  .route('/me')
+  .get(auth(), userController.getMe)
+  .patch(auth(PermissionType.UPDATE_OWN_PROFILE), validate(userValidation.updateMyProfile), userController.updateMe);
+
 // These routes are for admin management of users
 router
   .route('/')

@@ -6,12 +6,19 @@ import { AppError } from '@/utils/AppError';
 
 const createRole = catchAsync(async (req: Request, res: Response) => {
   const role = await roleService.createRole(req.body);
-  res.status(httpStatus.CREATED).send(role);
+  res.status(httpStatus.CREATED).send({
+    success: true,
+    message: 'Role created successfully.',
+    data: role,
+  });
 });
 
 const getRoles = catchAsync(async (req: Request, res: Response) => {
   const roles = await roleService.getRoles();
-  res.send(roles);
+  res.send({
+    success: true,
+    data: roles,
+  });
 });
 
 const getRole = catchAsync(async (req: Request, res: Response) => {
@@ -19,17 +26,27 @@ const getRole = catchAsync(async (req: Request, res: Response) => {
   if (!role) {
     throw new AppError('Role not found', httpStatus.NOT_FOUND);
   }
-  res.send(role);
+  res.send({
+    success: true,
+    data: role,
+  });
 });
 
 const updateRole = catchAsync(async (req: Request, res: Response) => {
   const role = await roleService.updateRoleById(req.params.roleId, req.body);
-  res.send(role);
+  res.send({
+    success: true,
+    message: 'Role updated successfully.',
+    data: role,
+  });
 });
 
 const deleteRole = catchAsync(async (req: Request, res: Response) => {
   await roleService.deleteRoleById(req.params.roleId);
-  res.status(httpStatus.NO_CONTENT).send();
+  res.status(httpStatus.OK).send({
+    success: true,
+    message: 'Role deleted successfully.',
+  });
 });
 
 export const roleController = {

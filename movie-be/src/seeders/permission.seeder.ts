@@ -10,6 +10,7 @@ const permissionsToSeed: { name: PermissionType; description: string }[] = [
   { name: PermissionType.READ_USERS, description: 'Allows viewing a list of users and their details.' },
   { name: PermissionType.UPDATE_USERS, description: 'Allows updating user information.' },
   { name: PermissionType.DELETE_USERS, description: 'Allows deleting users.' },
+  { name: PermissionType.UPDATE_OWN_PROFILE, description: 'Allows a user to update their own profile information.' },
   // Roles
   { name: PermissionType.CREATE_ROLES, description: 'Allows creating new roles.' },
   { name: PermissionType.READ_ROLES, description: 'Allows viewing a list of roles and their permissions.' },
@@ -35,6 +36,9 @@ const permissionsToSeed: { name: PermissionType; description: string }[] = [
   // Reviews
   { name: PermissionType.DELETE_ANY_REVIEW, description: 'Allows an admin or moderator to delete any review.' },
   { name: PermissionType.CREATE_OWN_REVIEW, description: 'Allows a user to post a review for a movie.' },
+  { name: PermissionType.READ_OWN_REVIEWS, description: 'Allows a user to read their own reviews.' },
+  { name: PermissionType.EDIT_OWN_REVIEW, description: 'Allows a user to edit their own review.' },
+  { name: PermissionType.DELETE_OWN_REVIEW, description: 'Allows a user to delete their own review.' },
   { name: PermissionType.READ_REVIEWS, description: 'Allows viewing reviews for a movie.' },
   // Dashboard
   { name: PermissionType.VIEW_DASHBOARD, description: 'Allows access to the admin dashboard for statistics.' },

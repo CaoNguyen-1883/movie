@@ -4,6 +4,9 @@ import { userService } from '../services/user.service';
 import { authService } from '../services/auth.service';
 import { tokenService } from '../services/token.service';
 import { catchAsync } from '../utils/catchAsync';
+import { IUser } from '@/interfaces/user.interface';
+import config from '@/config/config';
+import User from '@/models/user.model';
 
 /**
  * Handles the registration of a new local user.
@@ -51,9 +54,50 @@ const refreshTokens = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const googleCallback = catchAsync(async (req: Request, res: Response) => {
+  const googleUser = req.user as IUser;
+
+  // Re-fetch the user from the database to apply the necessary population
+  const user = await User.findById(googleUser._id).populate({
+    path: 'roles',
+    populate: {
+      path: 'permissions',
+      model: 'Permission'
+    }
+  });
+
+  if (!user) {
+    // This should ideally not happen if the passport strategy is correct
+    return res.redirect(`${config.clientUrl}/auth?error=UserNotFound`);
+  }
+
+  const tokens = await tokenService.generateAuthTokens(user);
+
+  // Convert user object to a JSON string, then encode it in Base64
+  const userString = JSON.stringify(user.toJSON());
+  const encodedUser = Buffer.from(userString).toString('base64');
+
+  // Construct the redirect URL with all necessary parameters
+  const redirectUrl = new URL(`${config.clientUrl}/auth/google/callback`);
+  redirectUrl.searchParams.set('accessToken', tokens.access.token);
+  redirectUrl.searchParams.set('refreshToken', tokens.refresh.token);
+  redirectUrl.searchParams.set('user', encodedUser); // Send the Base64 encoded user
+
+  res.redirect(redirectUrl.toString());
+});
+
+const changePassword = catchAsync(async (req: Request, res: Response) => {
+  const { currentPassword, newPassword } = req.body;
+  const userId = (req.user as IUser)._id;
+  await authService.changePassword(userId, currentPassword, newPassword);
+  res.status(httpStatus.OK).send({ success: true, message: 'Password changed successfully.' });
+});
+
 export const authController = {
   register,
   login,
   logout,
   refreshTokens,
+  googleCallback,
+  changePassword,
 };
