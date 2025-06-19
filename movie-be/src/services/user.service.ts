@@ -20,8 +20,18 @@ export const createUser = async (userBody: Partial<IUser>): Promise<IUser> => {
     throw new AppError('Username already taken', httpStatus.BAD_REQUEST);
   }
 
-  // Ensure roles are valid
-  if (userBody.roles && userBody.roles.length > 0) {
+  // If no roles are provided, assign the default 'USER' role
+  if (!userBody.roles || userBody.roles.length === 0) {
+    const userRole = await Role.findOne({ name: 'USER' });
+    if (userRole) {
+      userBody.roles = [userRole._id];
+    } else {
+      // Fallback or error if 'USER' role is not found.
+      // This might indicate a problem with the database seeding.
+      throw new AppError('Default user role not found.', httpStatus.INTERNAL_SERVER_ERROR);
+    }
+  } else {
+    // Ensure provided roles are valid if they are passed in the body
     const rolesCount = await Role.countDocuments({
       _id: { $in: userBody.roles },
     });
