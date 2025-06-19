@@ -5,9 +5,10 @@ import { Badge } from '@/components/ui/badge';
 
 interface MovieCardProps {
   movie: Movie;
+  children?: React.ReactNode;
 }
 
-export function MovieCard({ movie }: MovieCardProps) {
+export function MovieCard({ movie, children }: MovieCardProps) {
     return (
         <Link to={`/movie/${movie.slug}`} className="block group">
         <Card className="overflow-hidden h-full">
@@ -26,6 +27,7 @@ export function MovieCard({ movie }: MovieCardProps) {
                 </Badge>
                 )}
             </div>
+            {children}
             </CardContent>
         </Card>
         </Link>

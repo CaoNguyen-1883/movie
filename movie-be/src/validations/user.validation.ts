@@ -41,6 +41,14 @@ const updateUser = {
     .min(1),
 };
 
+const updateMyProfile = {
+  body: Joi.object()
+    .keys({
+      fullName: Joi.string().min(1).max(100),
+    })
+    .min(1),
+};
+
 const deleteUser = {
   params: Joi.object().keys({
     userId: Joi.string().hex().length(24).required(),
@@ -52,5 +60,6 @@ export const userValidation = {
   getUsers,
   getUser,
   updateUser,
+  updateMyProfile,
   deleteUser,
 }; 

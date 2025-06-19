@@ -27,4 +27,14 @@ export const updateUser = async (userId: string, updateData: Partial<User>): Pro
 
 export const deleteUser = async (userId: string): Promise<void> => {
   await api.delete(`/users/${userId}`);
-}; 
+};
+
+export const updateMyProfile = async (payload: Partial<User>): Promise<User> => {
+  const { data } = await api.patch('/users/me', payload);
+  return data.data;
+}
+
+export const getMe = async (): Promise<User> => {
+  const { data } = await api.get('/users/me');
+  return data.data;
+} 

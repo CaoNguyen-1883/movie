@@ -1,4 +1,5 @@
-import { Document, Types } from 'mongoose';
+import { Document, Model, Types } from 'mongoose';
+import { IRole } from './role.interface';
 
 export interface IUser extends Document {
   _id: Types.ObjectId;
@@ -7,7 +8,7 @@ export interface IUser extends Document {
   password?: string;
   fullName?: string;
   avatarUrl?: string;
-  roles: Types.ObjectId[]; // Ref to Role
+  roles: (Types.ObjectId | IRole)[];
   isActive: boolean;
   isEmailVerified: boolean;
   googleId?: string;
@@ -15,4 +16,8 @@ export interface IUser extends Document {
   createdAt: Date;
   updatedAt: Date;
   comparePassword(password: string): Promise<boolean>;
+}
+
+export interface IUserMethods {
+  isPasswordMatch(password: string): Promise<boolean>;
 } 

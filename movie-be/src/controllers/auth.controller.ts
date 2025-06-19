@@ -86,10 +86,18 @@ const googleCallback = catchAsync(async (req: Request, res: Response) => {
   res.redirect(redirectUrl.toString());
 });
 
+const changePassword = catchAsync(async (req: Request, res: Response) => {
+  const { currentPassword, newPassword } = req.body;
+  const userId = (req.user as IUser)._id;
+  await authService.changePassword(userId, currentPassword, newPassword);
+  res.status(httpStatus.OK).send({ success: true, message: 'Password changed successfully.' });
+});
+
 export const authController = {
   register,
   login,
   logout,
   refreshTokens,
   googleCallback,
+  changePassword,
 };

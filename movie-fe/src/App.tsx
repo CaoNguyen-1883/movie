@@ -12,6 +12,7 @@ import GenreManagementPage from './pages/admin/GenreManagementPage';
 import PersonManagementPage from './pages/admin/PersonManagementPage';
 import MovieManagementPage from './pages/admin/MovieManagementPage';
 import MovieDetailPage from './pages/MovieDetailPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   const { user, isLoading } = useAuth();
@@ -42,6 +43,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/movie/:slug" element={<MovieDetailPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           
           {/* Admin-only routes are also nested inside the MainLayout */}
           <Route element={<AdminRoute />}>

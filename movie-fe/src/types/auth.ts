@@ -24,4 +24,10 @@ export interface RefreshAuthResponse {
   success: boolean;
   message: string;
   data: Tokens;
+}
+
+export interface ChangePasswordPayload {
+  currentPassword?: string;
+  newPassword?: string;
+  confirmPassword?: string;
 } 

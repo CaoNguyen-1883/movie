@@ -1,11 +1,12 @@
 import httpStatus from 'http-status';
 import User from '@/models/user.model';
-import { IUser } from '@/interfaces/user.interface';
+import { IUser, IUserMethods } from '@/interfaces/user.interface';
 import { Token } from '@/models/token.model';
 import { AppError } from '@/utils/AppError';
 import { tokenService } from './token.service';
 import { TokenTypes } from '@/config/tokens';
 import Role from '@/models/role.model';
+import { Types } from 'mongoose';
 
 /**
  * Login with username/email and password.
@@ -74,8 +75,20 @@ const refreshAuth = async (refreshToken: string) => {
   }
 };
 
+const changePassword = async (userId: Types.ObjectId, currentPassword: string, newPassword: string): Promise<void> => {
+  const user = await User.findById(userId).select('+password');
+  if (!user || !(await (user as IUser & IUserMethods).isPasswordMatch(currentPassword))) {
+    throw new AppError('Incorrect current password', httpStatus.UNAUTHORIZED);
+  }
+
+  // User model's pre-save hook will hash the new password
+  user.password = newPassword;
+  await user.save();
+};
+
 export const authService = {
   loginUserWithEmailAndPassword,
   logout,
   refreshAuth,
+  changePassword,
 }; 

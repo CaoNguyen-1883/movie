@@ -88,7 +88,13 @@ export const queryUsers = async (filter: any, options: any) => {
  * @returns {Promise<IUser | null>} The user document or null if not found.
  */
 export const findUserById = async (id: string): Promise<IUser | null> => {
-  return User.findById(id).populate('roles');
+  return User.findById(id).populate({
+    path: 'roles',
+    populate: {
+      path: 'permissions',
+      model: 'Permission'
+    }
+  });
 };
 
 /**
@@ -122,6 +128,13 @@ export const updateUserById = async (userId: string, updateBody: UserUpdatePaylo
 
   Object.assign(user, updateBody);
   await user.save();
+  await user.populate({
+    path: 'roles',
+    populate: {
+      path: 'permissions',
+      model: 'Permission'
+    }
+  });
   return user;
 };
 

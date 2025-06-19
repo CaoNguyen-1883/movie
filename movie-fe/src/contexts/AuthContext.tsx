@@ -3,6 +3,7 @@ import { createContext, useState, useContext, useEffect, useCallback, useMemo } 
 import type { User } from '@/types/user';
 import type { Tokens, AuthResponse } from '@/types/auth';
 import { logout as logoutApi } from '@/services/authApi';
+import { getMe } from '@/services/userApi';
 import { PERMISSIONS } from '@/constants/permissions';
 
 // Type for the data passed to the login function
@@ -18,6 +19,7 @@ interface AuthContextType {
   logout: () => void;
   hasPermission: (permission: string) => boolean;
   permissions: Set<string>;
+  refetchUser: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -82,6 +84,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('tokens');
   }, [tokens]);
 
+  const refetchUser = useCallback(async () => {
+    try {
+      const updatedUser = await getMe();
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    } catch (error) {
+      console.error('Failed to refetch user data:', error);
+      // Optional: handle error, e.g., by logging out the user if the token is invalid
+      handleLogout();
+    }
+  }, [handleLogout]);
+
   const value = useMemo(() => ({
     user,
     tokens,
@@ -90,8 +104,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     login,
     logout: handleLogout,
     permissions,
-    hasPermission
-  }), [user, tokens, isLoading, handleLogout, permissions, hasPermission]);
+    hasPermission,
+    refetchUser,
+  }), [user, tokens, isLoading, handleLogout, permissions, hasPermission, refetchUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

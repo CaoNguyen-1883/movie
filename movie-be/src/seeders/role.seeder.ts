@@ -23,11 +23,15 @@ const seedRoles = async () => {
 
     // 1. Define and upsert USER role
     const userPermissionNames = [
+      PermissionType.UPDATE_OWN_PROFILE,
       PermissionType.READ_MOVIES,
       PermissionType.READ_GENRES,
       PermissionType.READ_PEOPLE,
       PermissionType.READ_REVIEWS,
       PermissionType.CREATE_OWN_REVIEW,
+      PermissionType.READ_OWN_REVIEWS,
+      PermissionType.EDIT_OWN_REVIEW,
+      PermissionType.DELETE_OWN_REVIEW,
       PermissionType.READ_OWN_HISTORY,
       PermissionType.UPDATE_OWN_HISTORY,
       PermissionType.DELETE_OWN_HISTORY,

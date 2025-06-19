@@ -32,12 +32,14 @@ export function DataTableRowActions<TData>({
     mutationFn: deleteGenre,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['genres'] });
+      setIsConfirmOpen(false);
       // Optionally, show a success toast here
     },
     onError: (error) => {
       // Optionally, show an error toast here
       console.error('Error deleting genre:', error);
       alert(`Failed to delete genre: ${error.message}`);
+      setIsConfirmOpen(false);
     },
   });
 

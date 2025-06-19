@@ -14,6 +14,7 @@ interface SidebarProps {
 
 export function Sidebar({ isSidebarOpen }: SidebarProps) {
   const { hasPermission } = useAuth()
+  console.log(useAuth())
   const isAdmin = hasPermission(PERMISSIONS.VIEW_DASHBOARD)
 
   const NavItem = ({

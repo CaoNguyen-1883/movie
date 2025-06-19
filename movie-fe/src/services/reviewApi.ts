@@ -1,4 +1,3 @@
-
 import api from '@/lib/axios';
 import type { Review } from '@/types/review';
 
@@ -14,7 +13,7 @@ interface CreateReviewPayload {
 /**
  * Payload for updating an existing review.
  */
-type UpdateReviewPayload = Partial<Omit<CreateReviewPayload, 'movieId'>>;
+export type UpdateReviewPayload = Partial<Omit<CreateReviewPayload, 'movieId'>>;
 
 
 /**
@@ -22,6 +21,14 @@ type UpdateReviewPayload = Partial<Omit<CreateReviewPayload, 'movieId'>>;
  */
 export const getReviewsByMovie = async (movieId: string): Promise<Review[]> => {
   const { data } = await api.get(`/reviews/movie/${movieId}`);
+  return data.data;
+};
+
+/**
+ * Fetches all reviews for the currently logged-in user.
+ */
+export const getMyReviews = async (): Promise<Review[]> => {
+  const { data } = await api.get('/reviews/me');
   return data.data;
 };
 

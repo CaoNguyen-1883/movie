@@ -29,6 +29,14 @@ const refreshTokens = {
   }),
 };
 
+const changePassword = {
+  body: Joi.object().keys({
+    currentPassword: Joi.string().required(),
+    newPassword: Joi.string().required().custom(password),
+    confirmPassword: Joi.string().required().valid(Joi.ref('newPassword')),
+  }),
+};
+
 // Add other validation schemas here e.g., for logout, refreshToken, etc.
 
 export const authValidation = {
@@ -36,4 +44,5 @@ export const authValidation = {
   login,
   logout,
   refreshTokens,
+  changePassword,
 }; 

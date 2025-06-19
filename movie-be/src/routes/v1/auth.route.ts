@@ -36,6 +36,13 @@ router.post(
   authController.refreshTokens
 );
 
+router.post(
+  '/change-password',
+  auth(),
+  validate(authValidation.changePassword),
+  authController.changePassword,
+);
+
 // Google OAuth routes
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 

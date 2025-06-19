@@ -12,7 +12,7 @@ class HistoryService {
    */
   public async getHistoryForUser(userId: string): Promise<IHistory[]> {
     const history = await History.find({ user: userId })
-      .populate('movie', 'title poster')
+      .populate('movie', 'title posterUrl slug genres')
       .sort({ watchedAt: -1 });
     return history;
   }
