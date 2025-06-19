@@ -66,6 +66,7 @@ export function Sidebar({ isSidebarOpen }: SidebarProps) {
       <div className="flex-1 overflow-y-auto">
         <nav className="grid items-start px-2 text-sm font-medium lg:px-4 py-4">
           <NavItem to="/" end icon={<Home className="h-4 w-4" />} label="Home" />
+          <NavItem to="/movies" icon={<Clapperboard className="h-4 w-4" />} label="Movies" />
           
           {isAdmin && (
             <>

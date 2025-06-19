@@ -18,7 +18,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table/DataTable';
 import { columns as initialColumns } from '@/components/admin/movies/columns';
-import { getMovies, deleteMovie } from '@/services/movieApi';
+import { getMovies, deleteMovie, updateMovie, type UpdateMoviePayload } from '@/services/movieApi';
 import { Input } from '@/components/ui/input';
 import { useDebounce } from '@/hooks/useDebounce';
 import type { Movie } from '@/types/movie';
@@ -26,19 +26,23 @@ import { AddMovieModal } from '@/components/admin/movies/AddMovieModal';
 import { EditMovieModal } from '@/components/admin/movies/EditMovieModal';
 import { VideoPlayerModal } from '@/components/common/VideoPlayerModal';
 import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, PlayCircle, Video, Trash2, Pencil } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent, DropdownMenuPortal, DropdownMenuRadioGroup, DropdownMenuRadioItem } from '@/components/ui/dropdown-menu';
+import { MoreHorizontal, PlayCircle, Video, Trash2, Pencil, Check } from 'lucide-react';
+
+const MOVIE_STATUSES: Movie['status'][] = ['COMING_SOON', 'NOW_SHOWING', 'RELEASED'];
 
 const ActionsCell = ({ 
     row, 
     onPlay,
     onDelete,
     onEdit,
+    onSetStatus,
 }: { 
     row: Row<Movie>, 
     onPlay: (url: string, title: string) => void,
     onDelete: (movie: Movie) => void,
     onEdit: (movie: Movie) => void,
+    onSetStatus: (status: Movie['status']) => void,
 }) => {
     const movie = row.original;
     return (
@@ -51,6 +55,26 @@ const ActionsCell = ({
                 <DropdownMenuItem onClick={() => onEdit(movie)}>
                     <Pencil className="mr-2 h-4 w-4" /> Edit
                 </DropdownMenuItem>
+                
+                <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                        Set Status
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                        <DropdownMenuSubContent>
+                            <DropdownMenuRadioGroup value={movie.status} onValueChange={(status) => onSetStatus(status as Movie['status'])}>
+                                {MOVIE_STATUSES.map(status => (
+                                    <DropdownMenuRadioItem key={status} value={status}>
+                                        {status.replace('_', ' ')}
+                                    </DropdownMenuRadioItem>
+                                ))}
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                </DropdownMenuSub>
+
+                <DropdownMenuSeparator />
+
                 <DropdownMenuItem onClick={() => onDelete(movie)} className="text-red-500">
                     <Trash2 className="mr-2 h-4 w-4" /> Delete
                 </DropdownMenuItem>
@@ -90,6 +114,17 @@ const MovieManagementPage = () => {
     movie: null,
   });
 
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ movieId, payload }: { movieId: string; payload: UpdateMoviePayload }) => updateMovie(movieId, payload),
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['movies'] });
+    },
+    onError: (error) => {
+        console.error("Failed to update movie status:", error);
+        // You could add a user-facing error message here
+    }
+  });
+
   const deleteMutation = useMutation({
     mutationFn: (movieId: string) => deleteMovie(movieId),
     onSuccess: () => {
@@ -111,6 +146,10 @@ const MovieManagementPage = () => {
     setEditState({ isOpen: true, movie });
   };
 
+  const handleSetStatus = (movie: Movie, status: Movie['status']) => {
+    updateStatusMutation.mutate({ movieId: movie._id, payload: { status } });
+  };
+
   const handlePlay = (url: string, title: string) => {
     setPlayerState({ isOpen: true, url, title });
   };
@@ -127,6 +166,7 @@ const MovieManagementPage = () => {
             onPlay={handlePlay} 
             onDelete={handleOpenDeleteDialog}
             onEdit={handleOpenEditDialog}
+            onSetStatus={ (status) => handleSetStatus(row.original, status) }
         />
     }
     return [...initialColumns.filter(c => c.id !== 'actions'), actionsColumn]
