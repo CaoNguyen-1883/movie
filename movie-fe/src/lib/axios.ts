@@ -47,14 +47,12 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    // If the error is not a 401, or it's a request to the refresh-tokens endpoint,
-    // or we've already tried this request, just reject it.
-    if (error.response?.status !== 401 || originalRequest.url === '/auth/refresh-tokens' || originalRequest._retry) {
+
+    if (error.response?.status !== 401 || originalRequest.url === '/auth/refresh-token' || originalRequest._retry) {
       return Promise.reject(error.response?.data || 'Something went wrong');
     }
 
     if (isRefreshing) {
-      // If we are already refreshing the token, we push the new request into a queue.
       return new Promise((resolve, reject) => {
         failedQueue.push({ resolve, reject });
       })
@@ -73,7 +71,7 @@ axiosInstance.interceptors.response.use(
     const tokensString = localStorage.getItem('tokens');
     if (!tokensString) {
       isRefreshing = false;
-      window.location.href = '/auth'; // Or trigger logout
+      window.location.href = '/auth';
       return Promise.reject(error);
     }
 
@@ -82,17 +80,17 @@ axiosInstance.interceptors.response.use(
 
     if (!refreshToken) {
       isRefreshing = false;
-      window.location.href = '/auth'; // Or trigger logout
+      window.location.href = '/auth';
       return Promise.reject(error);
     }
-
+    
     try {
       const response = await refreshAuth({ refreshToken });
-      const newTokens = response.data; // response.data is now correctly typed as `Tokens`
+
+      const newTokens = response.data;
       
       localStorage.setItem('tokens', JSON.stringify(newTokens));
-      // The refresh token endpoint doesn't return user info, so we don't update it.
-
+      
       originalRequest.headers.Authorization = `Bearer ${newTokens.access.token}`;
       
       processQueue(null, newTokens.access.token);
@@ -100,7 +98,6 @@ axiosInstance.interceptors.response.use(
       return axiosInstance(originalRequest);
     } catch (refreshError: any) {
       processQueue(refreshError, null);
-      // If refresh fails, clear everything and redirect to login
       localStorage.removeItem('tokens');
       localStorage.removeItem('user');
       window.location.href = '/auth';
