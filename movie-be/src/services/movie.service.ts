@@ -79,10 +79,11 @@ const queryMovies = async (filter: any, options: any): Promise<any> => {
   if (filter.title) {
     query.title = { $regex: filter.title, $options: 'i' };
   }
-  // We're reverting the status filter for now to restore stability
-  // if (filter.status) {
-  //   query.status = filter.status;
-  // }
+
+  // Restore the status filter
+  if (filter.status) {
+    query.status = filter.status;
+  }
 
   const sort: { [key: string]: 'asc' | 'desc' } = {};
   if (options.sortBy) {
