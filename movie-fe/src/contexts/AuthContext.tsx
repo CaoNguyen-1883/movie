@@ -4,7 +4,7 @@ import type { User } from '@/types/user';
 import type { Tokens, AuthResponse } from '@/types/auth';
 import { logout as logoutApi } from '@/services/authApi';
 import { getMe } from '@/services/userApi';
-import { PERMISSIONS } from '@/constants/permissions';
+// import { PERMISSIONS } from '@/constants/permissions';
 
 // Type for the data passed to the login function
 type AuthData = AuthResponse['data'];

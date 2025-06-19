@@ -1,13 +1,17 @@
 # Build stage
 FROM node:20-alpine as builder
 
+# Nhận biến môi trường từ docker-compose
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL}
+
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies with increased timeout
+RUN npm install --timeout=120000
 
 # Copy source code
 COPY . .

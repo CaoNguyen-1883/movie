@@ -1,26 +1,27 @@
 version: '3.8'
 
 services:
-  frontend:
-    build:
-      context: ./movie-fe
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-    networks:
-      - app-network
-
+  # Dịch vụ Backend (Node.js/Express)
   backend:
     build:
       context: ./movie-be
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
-    networks:
-      - app-network
+    env_file:
+      - .env # Sử dụng các biến môi trường từ file .env ở thư mục gốc
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
-networks:
-  app-network:
-    driver: bridge 
+  # Dịch vụ Frontend (React/Vite/Nginx)
+  frontend:
+    build:
+      context: ./movie-fe
+      dockerfile: Dockerfile
+      args:
+        # Truyền biến VITE_API_URL vào quá trình build của frontend
+        VITE_API_URL: ${VITE_API_URL}
+    ports:
+      - "80:80"
+    depends_on:
+      - backend # Đảm bảo backend khởi chạy trước frontend 

@@ -1,25 +1,28 @@
 import { type Row } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
+// import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
-  DropdownMenuLabel
 } from "@/components/ui/dropdown-menu"
-import type { Movie } from "@/types/movie"
+// import type { Movie } from "@/types/movie"
+// import { EditMovieModal } from './EditMovieModal'
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
 }
 
 export function DataTableRowActions<TData>({
-  row,
+  // row,
 }: DataTableRowActionsProps<TData>) {
-  const movie = row.original as Movie
+  // const movie = row.original as Movie
+
+  // const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   return (
     <DropdownMenu>

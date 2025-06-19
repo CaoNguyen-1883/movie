@@ -69,7 +69,9 @@ export const EditUserForm = ({ user, onSubmit, onCancel, isSubmitting }: EditUse
         <FormField
           control={form.control}
           name="roles"
-          render={({ field }) => (
+          render={({ 
+            //field 
+          }) => (
             <FormItem>
               <FormLabel>Roles</FormLabel>
               <FormDescription>Select the roles for this user.</FormDescription>

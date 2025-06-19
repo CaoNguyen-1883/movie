@@ -4,8 +4,11 @@ import { useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
-import { MovieCard } from '@/components/common/MovieCard';
-import type { Review, PopulatedReview } from '@/types/review';
+// import { MovieCard } from '@/components/common/MovieCard';
+import type { 
+  // Review, 
+  PopulatedReview 
+} from '@/types/review';
 import {
   Card,
   CardContent,
@@ -53,8 +56,8 @@ export function UserReviewsTab() {
     return (
       <Alert variant="destructive">
         <Terminal className="h-4 w-4" />
-        <AlertTitle>Lỗi!</AlertTitle>
-        <AlertDescription>Không thể tải các đánh giá của bạn. Vui lòng thử lại sau.</AlertDescription>
+        <AlertTitle>Error!</AlertTitle>
+        <AlertDescription>Could not load your reviews. Please try again later.</AlertDescription>
       </Alert>
     );
   }
@@ -63,8 +66,8 @@ export function UserReviewsTab() {
     return (
       <Alert>
         <Terminal className="h-4 w-4" />
-        <AlertTitle>Chưa có đánh giá</AlertTitle>
-        <AlertDescription>Bạn chưa viết đánh giá cho bộ phim nào.</AlertDescription>
+        <AlertTitle>No Reviews Yet</AlertTitle>
+        <AlertDescription>You haven't written a review for any movie yet.</AlertDescription>
       </Alert>
     );
   }
@@ -126,10 +129,10 @@ function ReviewItem({ review }: { review: PopulatedReview }) {
         </CardContent>
         <CardFooter className="flex justify-end gap-2">
           <Button variant="outline" size="sm" onClick={() => setIsEditDialogOpen(true)}>
-            Sửa
+            Edit
           </Button>
           <Button variant="destructive" size="sm" onClick={() => setIsDeleteDialogOpen(true)} disabled={deleteMutation.isPending}>
-            {deleteMutation.isPending ? 'Đang xóa...' : 'Xóa'}
+            {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
           </Button>
         </CardFooter>
       </Card>
@@ -137,15 +140,15 @@ function ReviewItem({ review }: { review: PopulatedReview }) {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
+            <AlertDialogTitle>Are you sure you want to delete?</AlertDialogTitle>
             <AlertDialogDescription>
-              Hành động này không thể được hoàn tác. Đánh giá của bạn sẽ bị xóa vĩnh viễn.
+              This action cannot be undone. Your review will be permanently deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteMutation.isPending}>Hủy</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={() => deleteMutation.mutate()} disabled={deleteMutation.isPending}>
-              {deleteMutation.isPending ? 'Đang xóa...' : 'Xóa'}
+              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

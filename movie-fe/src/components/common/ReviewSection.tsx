@@ -5,7 +5,7 @@ import { Star, Trash2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ReviewForm } from './ReviewForm';
 import { Button } from '../ui/button';
-import { useState } from 'react';
+// import { useState } from 'react';
 import type { Review } from '@/types/review';
 
 interface ReviewSectionProps {
@@ -40,7 +40,7 @@ export function ReviewSection({ movieId }: ReviewSectionProps) {
 
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [isEditing, setIsEditing] = useState(false);
+  // const [isEditing, setIsEditing] = useState(false);
 
   // Find the user's existing review, if any
   // Important: Only try to find a review if the user is logged in
@@ -66,7 +66,7 @@ export function ReviewSection({ movieId }: ReviewSectionProps) {
     }
   }
   
-  const handleEditToggle = () => setIsEditing(!isEditing);
+  // const handleEditToggle = () => setIsEditing(!isEditing);
 
   if (isLoading) {
     return <div>Loading reviews...</div>;

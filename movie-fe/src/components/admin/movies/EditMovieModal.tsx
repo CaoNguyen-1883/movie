@@ -60,8 +60,8 @@ type EditMovieFormData = z.infer<typeof movieSchema>;
 export function EditMovieModal({ isOpen, onClose, movie }: EditMovieModalProps) {
   const queryClient = useQueryClient();
 
-  const { data: genres, isLoading: isLoadingGenres } = useQuery({ queryKey: ['allGenres'], queryFn: getAllGenres });
-  const { data: people, isLoading: isLoadingPeople } = useQuery({ queryKey: ['allPeople'], queryFn: getAllPeople });
+  const { data: genres } = useQuery({ queryKey: ['allGenres'], queryFn: getAllGenres });
+  const { data: people } = useQuery({ queryKey: ['allPeople'], queryFn: getAllPeople });
 
   const {
     register,

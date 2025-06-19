@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon --ext ts,d.ts,json --exec ts-node -r tsconfig-paths/register src/index.ts",
-    "build": "tsc",
-    "start": "node -r tsconfig-paths/register dist/index.js",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/index.js",
     "seed:admin": "ts-node -r tsconfig-paths/register src/seeders/admin.seeder.ts",
     "seed:permissions": "ts-node -r tsconfig-paths/register src/seeders/permission.seeder.ts",
     "seed:roles": "ts-node -r tsconfig-paths/register src/seeders/role.seeder.ts",
@@ -48,6 +48,7 @@
     "@types/passport-jwt": "^4.0.1",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.1",
+    "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.0.3"
   },

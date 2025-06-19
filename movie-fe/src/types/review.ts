@@ -8,8 +8,8 @@ interface TimeStamps {
 
 export interface Review extends TimeStamps {
   _id: string;
-  user: User | string;
-  movie: Movie | string;
+  user: User;
+  movie: Movie;
   rating: number;
   comment?: string;
 }

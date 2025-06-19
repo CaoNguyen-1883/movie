@@ -20,7 +20,7 @@ import {
   createMovie,
   type CreateMoviePayload,
 } from '@/services/movieApi';
-import type { Movie } from '@/types/movie';
+//  import type { Movie } from '@/types/movie';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MultiSelect, type MultiSelectOption } from '@/components/ui/multi-select';
@@ -67,15 +67,15 @@ type AddMovieFormData = z.infer<typeof movieSchema>;
 export function AddMovieModal({ isOpen, onClose }: AddMovieModalProps) {
   const queryClient = useQueryClient();
 
-  const { data: genres, isLoading: isLoadingGenres } = useQuery({
+  const { data: genres } = useQuery({
     queryKey: ['allGenres'],
     queryFn: getAllGenres,
   });
 
-  const { data: people, isLoading: isLoadingPeople } = useQuery({
+  const { data: people } = useQuery({
     queryKey: ['allPeople'],
     queryFn: getAllPeople,
-  });
+  }); 
 
   const {
     register,
