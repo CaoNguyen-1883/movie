@@ -2,7 +2,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import  AuthPage  from './pages/AuthPage';
 import  HomePage  from './pages/HomePage';
-import { AdminPage } from './pages/AdminPage';
 import { GoogleCallbackPage } from './pages/GoogleCallbackPage';
 import { AdminRoute, ProtectedRoute } from './components/common/ProtectedRoute';
 import { MainLayout } from './layouts/MainLayout';
@@ -14,6 +13,7 @@ import MovieManagementPage from './pages/admin/MovieManagementPage';
 import MovieDetailPage from './pages/MovieDetailPage';
 import ProfilePage from './pages/ProfilePage';
 import MoviesPage from './pages/MoviesPage';
+import DashboardPage from './pages/admin/DashboardPage';
 
 function App() {
   const { user, isLoading } = useAuth();
@@ -49,7 +49,8 @@ function App() {
           
           {/* Admin-only routes are also nested inside the MainLayout */}
           <Route element={<AdminRoute />}>
-            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="/admin/dashboard" element={<DashboardPage />} />
             <Route path="/admin/users" element={<UserManagementPage />} />
             <Route path="/admin/roles" element={<RoleManagementPage />} />
             <Route path="/admin/genres" element={<GenreManagementPage />} />

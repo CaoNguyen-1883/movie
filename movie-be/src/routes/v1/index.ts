@@ -8,6 +8,7 @@ import personRoute from './person.route';
 import movieRoute from './movie.route';
 import reviewRoute from './review.route';
 import historyRoutes from './history.route';
+import dashboardRoute from './dashboard.route';
 
 const router = express.Router();
 
@@ -47,6 +48,10 @@ const defaultRoutes = [
   {
     path: '/history',
     route: historyRoutes,
+  },
+  {
+    path: '/dashboard',
+    route: dashboardRoute,
   },
   // Add other v1 routes here in the future
   /*
