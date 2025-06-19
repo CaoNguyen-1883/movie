@@ -19,7 +19,7 @@ export const HeroBanner = () => {
   });
 
   if (isLoading) {
-    return <Skeleton className="w-full aspect-[16/7] rounded-none" />;
+    return <Skeleton className="w-full aspect-16/7 rounded-none" />;
   }
 
   if (error || !movies || movies.results.length === 0) {
@@ -39,13 +39,13 @@ export const HeroBanner = () => {
       <CarouselContent>
         {movies.results.map((movie) => (
           <CarouselItem key={movie._id}>
-            <div className="relative aspect-[16/7]">
+            <div className="relative aspect-16/7">
               <img
                 src={movie.backdropUrls?.[0] || 'https://via.placeholder.com/1280x720?text=No+Image'}
                 alt={movie.title}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent" />
               <div className="absolute bottom-0 left-0 p-8 md:p-12 lg:p-16 max-w-3xl text-white">
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold drop-shadow-lg">
                   {movie.title}

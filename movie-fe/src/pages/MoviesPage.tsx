@@ -48,7 +48,7 @@ const MoviesPage = () => {
           placeholder="Search for a movie..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-grow"
+          className="grow"
         />
         <Select value={statusFilter} onValueChange={handleStatusChange}>
           <SelectTrigger className="w-full md:w-[180px]">
@@ -66,7 +66,7 @@ const MoviesPage = () => {
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {Array.from({ length: 10 }).map((_, index) => (
-            <Skeleton key={index} className="w-full aspect-[2/3]" />
+            <Skeleton key={index} className="w-full aspect-2/3" />
           ))}
         </div>
       ) : isError || !data || data.results.length === 0 ? (

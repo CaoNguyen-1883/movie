@@ -152,7 +152,7 @@ export function VideoPlayerModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-none sm:max-w-none w-5/7 h-auto aspect-video p-0">
-        <DialogHeader className="p-4 absolute top-0 left-0 bg-gradient-to-b from-black/70 to-transparent w-full z-10">
+        <DialogHeader className="p-4 absolute top-0 left-0 bg-linear-to-b from-black/70 to-transparent w-full z-10">
           <DialogTitle className="text-white">{title || 'Video Player'}</DialogTitle>
         </DialogHeader>
         <div className="aspect-video bg-black">

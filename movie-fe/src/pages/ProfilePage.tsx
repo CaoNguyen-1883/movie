@@ -7,11 +7,10 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useMutation } from '@tanstack/react-query';
 import { updateMyProfile } from '@/services/userApi';
-import type { User } from '@/types/user';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserHistoryTab } from '@/components/profile/UserHistoryTab';
 import { UserReviewsTab } from '@/components/profile/UserReviewsTab';
@@ -46,7 +45,7 @@ const ProfilePage = () => {
 
   const updateProfileMutation = useMutation({
     mutationFn: updateMyProfile,
-    onSuccess: (updatedUser) => {
+    onSuccess: () => { // 'updatedUser' is declared but its value is never read
       refetchUser();
 
       setIsEditing(false);

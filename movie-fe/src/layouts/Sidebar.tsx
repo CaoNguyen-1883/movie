@@ -6,7 +6,7 @@ import { PERMISSIONS } from "@/constants/permissions"
 import { cn } from "@/lib/utils"
 import { Home, Shield, Video, Users, ShieldCheck, Library, Contact, Clapperboard } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { AuthContext } from '@/contexts/AuthContext'
+
 
 interface SidebarProps {
   isSidebarOpen: boolean;

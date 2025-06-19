@@ -27,7 +27,7 @@ import { EditMovieModal } from '@/components/admin/movies/EditMovieModal';
 import { VideoPlayerModal } from '@/components/common/VideoPlayerModal';
 import { ConfirmationDialog } from '@/components/common/ConfirmationDialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent, DropdownMenuPortal, DropdownMenuRadioGroup, DropdownMenuRadioItem } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, PlayCircle, Video, Trash2, Pencil, Check } from 'lucide-react';
+import { MoreHorizontal, PlayCircle, Video, Trash2, Pencil } from 'lucide-react';
 
 const MOVIE_STATUSES: Movie['status'][] = ['COMING_SOON', 'NOW_SHOWING', 'RELEASED'];
 
