@@ -47,6 +47,7 @@ export const createMovie = async (movieData: CreateMoviePayload): Promise<Movie>
 };
 
 export const updateMovie = async (movieId: string, updateData: UpdateMoviePayload): Promise<Movie> => {
+  console.log('updateData', updateData);
   const response = await api.patch(`/movies/${movieId}`, updateData);
   return response.data.data;
 };

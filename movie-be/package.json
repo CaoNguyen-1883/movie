@@ -11,6 +11,7 @@
     "seed:permissions": "ts-node -r tsconfig-paths/register src/seeders/permission.seeder.ts",
     "seed:roles": "ts-node -r tsconfig-paths/register src/seeders/role.seeder.ts",
     "seed:genres": "ts-node -r tsconfig-paths/register src/seeders/genre.seeder.ts",
+    "seed:movies": "ts-node -r tsconfig-paths/register src/seeders/movie.seeder.ts",
     "seed:all": "npm run seed:permissions && npm run seed:roles && npm run seed:genres && npm run seed:admin"
   },
   "dependencies": {

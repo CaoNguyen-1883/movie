@@ -72,9 +72,9 @@ const updateMovie = {
           characterName: Joi.string().required(),
         }),
       ),
-      posterUrl: Joi.string().uri(),
-      trailerUrl: Joi.string().uri(),
-      videoUrl: Joi.string().uri(),
+      posterUrl: Joi.string().uri().allow(''),
+      trailerUrl: Joi.string().uri().allow(''),
+      videoUrl: Joi.string().uri().allow(''),
       backdropUrls: Joi.array().items(Joi.string().uri()),
     })
     .min(1),

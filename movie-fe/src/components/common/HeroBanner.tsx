@@ -1,38 +1,22 @@
 import { useQuery } from '@tanstack/react-query';
 import { getMovies } from '@/services/movieApi';
-import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
-import { useCallback, useEffect, useState } from 'react';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 export const HeroBanner = () => {
+  const plugin = useRef(
+    Autoplay({ delay: 5000, stopOnInteraction: true })
+  );
+
   const { data: movies, isLoading, error } = useQuery({
     queryKey: ['movies', { status: 'NOW_SHOWING', sortBy: 'createdAt:desc', limit: 5 }],
     queryFn: () => getMovies({ status: 'NOW_SHOWING', sortBy: 'createdAt:desc', limit: 5 }),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
-
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 5000 })]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setSelectedIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    emblaApi.on('select', onSelect);
-    return () => {
-      emblaApi.off('select', onSelect);
-    };
-  }, [emblaApi, onSelect]);
-
-  const scrollTo = useCallback((index: number) => {
-    emblaApi?.scrollTo(index);
-  }, [emblaApi]);
 
   if (isLoading) {
     return <Skeleton className="w-full aspect-[16/7] rounded-none" />;
@@ -43,11 +27,19 @@ export const HeroBanner = () => {
   }
 
   return (
-    <div className="relative w-full" ref={emblaRef}>
-      <div className="overflow-hidden">
-        <div className="flex">
-          {movies.results.map((movie) => (
-            <div className="flex-[0_0_100%] relative aspect-[16/7]" key={movie._id}>
+    <Carousel
+      plugins={[plugin.current]}
+      className="w-full"
+      onMouseEnter={plugin.current.stop}
+      onMouseLeave={plugin.current.reset}
+      opts={{
+        loop: true,
+      }}
+    >
+      <CarouselContent>
+        {movies.results.map((movie) => (
+          <CarouselItem key={movie._id}>
+            <div className="relative aspect-[16/7]">
               <img
                 src={movie.backdropUrls?.[0] || 'https://via.placeholder.com/1280x720?text=No+Image'}
                 alt={movie.title}
@@ -61,27 +53,18 @@ export const HeroBanner = () => {
                 <p className="mt-4 text-sm md:text-base line-clamp-3 drop-shadow-md">
                   {movie.description}
                 </p>
-                <Link to={`/movies/${movie.slug}`}>
+                <Link to={`/movie/${movie.slug}`}>
                   <Button className="mt-6" size="lg">
                     Watch Now
                   </Button>
                 </Link>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-        {movies.results.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => scrollTo(index)}
-            className={`w-2.5 h-2.5 rounded-full transition-colors ${
-              selectedIndex === index ? 'bg-white' : 'bg-white/50'
-            }`}
-          />
+          </CarouselItem>
         ))}
-      </div>
-    </div>
+      </CarouselContent>
+      <CarouselPrevious className="left-4" />
+      <CarouselNext className="right-4" />
+    </Carousel>
   );
 }; 
